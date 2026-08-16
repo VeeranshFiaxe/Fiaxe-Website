@@ -1,0 +1,3 @@
+# Copied into out/ by the Next.js build, where Wrangler reads it to decide
+# which files to skip uploading to Workers Static Assets.
+.DS_Store

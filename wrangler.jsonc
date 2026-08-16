@@ -1,0 +1,29 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "fiaxe-website",
+  "main": "worker/index.ts",
+
+  // WebVerge (xtremetricks12@gmail.com). Pinned so a `wrangler login` under a
+  // different account cannot silently deploy this site somewhere else.
+  "account_id": "bc179c6141c15f2b2f69a8615300724b",
+  "compatibility_date": "2026-08-11",
+
+  "assets": {
+    // `npm run build` writes the static export here (output: "export").
+    "directory": "./out",
+    "binding": "ASSETS",
+
+    // Default. Serves out/agents.html at /agents, so the extensionless URLs
+    // work without the Netlify-style rewrite rules we used to ship.
+    "html_handling": "auto-trailing-slash",
+
+    // Next.js emits out/404.html.
+    "not_found_handling": "404-page",
+
+    // Only the n8n proxies need the Worker; every other request is served
+    // straight from static assets without invoking it.
+    "run_worker_first": ["/api/*"]
+  },
+
+  "observability": { "enabled": true }
+}

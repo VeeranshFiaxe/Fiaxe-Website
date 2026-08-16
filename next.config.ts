@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // static export; the site has no server-side code, deployed to Cloudflare Pages
+  // Static export into out/, served by Cloudflare Workers Static Assets.
+  // The only server-side code is the pair of n8n proxies, which the Worker in
+  // worker/index.ts handles (see wrangler.jsonc).
   output: "export",
 };
 

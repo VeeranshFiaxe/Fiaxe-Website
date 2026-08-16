@@ -18,9 +18,27 @@ const ROUTES: Record<string, (request: Request) => Promise<Response>> = {
   "/api/careers": proxyCareers,
 };
 
+// The staging and workers.dev hostnames serve a byte-identical copy of the
+// production site. Left crawlable they would compete with fiaxe.com in search,
+// so they get a disallow-all robots.txt instead of the one Next.js generates.
+function isNonCanonicalHost(hostname: string): boolean {
+  return hostname.startsWith("staging.") || hostname.endsWith(".workers.dev");
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const handler = ROUTES[new URL(request.url).pathname];
+    const url = new URL(request.url);
+
+    if (url.pathname === "/robots.txt" && isNonCanonicalHost(url.hostname)) {
+      return new Response("User-agent: *\nDisallow: /\n", {
+        headers: {
+          "content-type": "text/plain; charset=utf-8",
+          "x-robots-tag": "noindex, nofollow",
+        },
+      });
+    }
+
+    const handler = ROUTES[url.pathname];
 
     if (handler) {
       if (request.method !== "POST") {

@@ -1,0 +1,9 @@
+# Next.js static export emits one .html file per route (e.g. agents.html).
+# These 200 (rewrite) rules serve the right file for clean, extensionless
+# URLs so links like /agents resolve correctly on Netlify. Static files
+# (audio, _next assets, favicon) take precedence and are served directly.
+/agents           /agents.html           200
+/book-demo        /book-demo.html        200
+/careers          /careers.html          200
+/customer-stories /customer-stories.html 200
+/pricing          /pricing.html          200

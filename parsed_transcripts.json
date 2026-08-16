@@ -1,0 +1,986 @@
+{
+  "Copy of cart recovery_transcript.txt": [
+    {
+      "speaker": "agent",
+      "text": "Hello, this is प्रिया calling from. Am I speaking with अनुराग?",
+      "length": 62,
+      "startProgress": 0,
+      "endProgress": 0.07021517553793885
+    },
+    {
+      "speaker": "user",
+      "text": "Yes.",
+      "length": 4,
+      "startProgress": 0.07021517553793885,
+      "endProgress": 0.07474518686296716
+    },
+    {
+      "speaker": "agent",
+      "text": "Great, thank you. Are you comfortable speaking in हिंदी or english?",
+      "length": 67,
+      "startProgress": 0.07474518686296716,
+      "endProgress": 0.1506228765571914
+    },
+    {
+      "speaker": "user",
+      "text": "हिंदी में बात",
+      "length": 13,
+      "startProgress": 0.1506228765571914,
+      "endProgress": 0.16534541336353342
+    },
+    {
+      "speaker": "agent",
+      "text": "करना, नमस्कार.",
+      "length": 14,
+      "startProgress": 0.16534541336353342,
+      "endProgress": 0.18120045300113252
+    },
+    {
+      "speaker": "user",
+      "text": "ठीक है, हम हिंदी में बात करेंगे. मैंने देखा कि आपने smart wave light strip को website पर देखा था. क्या मैं आपको दो minute देने के लिए एक special offer बता सकती हूं?",
+      "length": 164,
+      "startProgress": 0.18120045300113252,
+      "endProgress": 0.3669309173272933
+    },
+    {
+      "speaker": "agent",
+      "text": "जी जी बताइए ना.",
+      "length": 15,
+      "startProgress": 0.3669309173272933,
+      "endProgress": 0.38391845979614947
+    },
+    {
+      "speaker": "user",
+      "text": "Smart wave light strip पर दस percent off चल रहा है अभी. सिर्फ़ आज तक valid है. क्या आप interested हैं?",
+      "length": 102,
+      "startProgress": 0.38391845979614947,
+      "endProgress": 0.49943374858437145
+    },
+    {
+      "speaker": "agent",
+      "text": "हां ठीक है चलेगा.",
+      "length": 17,
+      "startProgress": 0.49943374858437145,
+      "endProgress": 0.5186862967157417
+    },
+    {
+      "speaker": "user",
+      "text": "क्या आप अभी ख़रीदना चाहेंगे?",
+      "length": 28,
+      "startProgress": 0.5186862967157417,
+      "endProgress": 0.5503963759909399
+    },
+    {
+      "speaker": "agent",
+      "text": "अभी तो नहीं, मैं बाद में आपको बताता हूं.",
+      "length": 40,
+      "startProgress": 0.5503963759909399,
+      "endProgress": 0.5956964892412231
+    },
+    {
+      "speaker": "user",
+      "text": "ठीक है, कोई बात नहीं. Same coupon base को portable fan या aquasense smart bottle पर भी लग सकता है. अगर आपको कभी ज़रूरत हो तो. क्या मैं आपको WhatsApp पर link भेज सकती हूं? जी जी भेज दीजिए.",
+      "length": 187,
+      "startProgress": 0.5956964892412231,
+      "endProgress": 0.8074745186862967
+    },
+    {
+      "speaker": "agent",
+      "text": "बढ़िया. मैंने आपके लिए WhatsApp पर link भेजने का arrangement कर दिया है. बस कुछ ही minutes में मिल जाएगा. कुछ और मदद चाहिए? नहीं नहीं, thank you.",
+      "length": 145,
+      "startProgress": 0.8074745186862967,
+      "endProgress": 0.9716874292185731
+    },
+    {
+      "speaker": "user",
+      "text": "धन्यवाद. आपका दिन शुभ हो.",
+      "length": 25,
+      "startProgress": 0.9716874292185731,
+      "endProgress": 1
+    }
+  ],
+  "Copy of cod_transcript.txt": [
+    {
+      "speaker": "agent",
+      "text": "Hello भव्या. My name is प्रिया and I am calling from.",
+      "length": 53,
+      "startProgress": 0,
+      "endProgress": 0.087893864013267
+    },
+    {
+      "speaker": "user",
+      "text": "Can I have 2 minutes of your time?",
+      "length": 34,
+      "startProgress": 0.087893864013267,
+      "endProgress": 0.14427860696517414
+    },
+    {
+      "speaker": "agent",
+      "text": "Yes.",
+      "length": 4,
+      "startProgress": 0.14427860696517414,
+      "endProgress": 0.15091210613598674
+    },
+    {
+      "speaker": "user",
+      "text": "Before we begin would you like to continue this conversation in हिंदी or english?",
+      "length": 81,
+      "startProgress": 0.15091210613598674,
+      "endProgress": 0.285240464344942
+    },
+    {
+      "speaker": "agent",
+      "text": "हिंदी.",
+      "length": 6,
+      "startProgress": 0.285240464344942,
+      "endProgress": 0.2951907131011609
+    },
+    {
+      "speaker": "user",
+      "text": "जी. Call आपके cash on delivery order को confirm करने के लिए है. जो आपने हाल ही में place थी. इसमें एक winter cap है और आपको delivery के time 05:50 rupees का payment करना होगा. Just to check, क्या आप यह delivery confirm करना चाहते हैं?",
+      "length": 234,
+      "startProgress": 0.2951907131011609,
+      "endProgress": 0.6832504145936982
+    },
+    {
+      "speaker": "agent",
+      "text": "हां.",
+      "length": 4,
+      "startProgress": 0.6832504145936982,
+      "endProgress": 0.6898839137645107
+    },
+    {
+      "speaker": "user",
+      "text": "Alright, मैंने आपका order confirm कर दिया है जो कि दस दिनों में deliver हो जाएगी. Fiax के customer बनने के लिए thanks. अगर कोई और help चाहिए तो please contact ज़रूर करें. आपका दिन शुभ हो.",
+      "length": 187,
+      "startProgress": 0.6898839137645107,
+      "endProgress": 1
+    }
+  ],
+  "Copy of collection bot_transcript.txt": [
+    {
+      "speaker": "agent",
+      "text": "Hello. Am I speaking with अनुराग?",
+      "length": 33,
+      "startProgress": 0,
+      "endProgress": 0.04044117647058824
+    },
+    {
+      "speaker": "user",
+      "text": "Yes.",
+      "length": 4,
+      "startProgress": 0.04044117647058824,
+      "endProgress": 0.045343137254901966
+    },
+    {
+      "speaker": "agent",
+      "text": "Hello अनुराग. This is मोनिका from Fiax credit card services. Do you have a minute to talk?",
+      "length": 90,
+      "startProgress": 0.045343137254901966,
+      "endProgress": 0.1556372549019608
+    },
+    {
+      "speaker": "user",
+      "text": "Yes.",
+      "length": 4,
+      "startProgress": 0.1556372549019608,
+      "endProgress": 0.16053921568627452
+    },
+    {
+      "speaker": "agent",
+      "text": "So there's about 30000 rupees pending on your Phiaks card due in the next 2 days.",
+      "length": 81,
+      "startProgress": 0.16053921568627452,
+      "endProgress": 0.25980392156862747
+    },
+    {
+      "speaker": "user",
+      "text": "Missing that means a late fee of around 750",
+      "length": 43,
+      "startProgress": 0.25980392156862747,
+      "endProgress": 0.3125
+    },
+    {
+      "speaker": "agent",
+      "text": "rupees plus interest. ऐसे or you looking to pay now or before the due date?",
+      "length": 75,
+      "startProgress": 0.3125,
+      "endProgress": 0.40441176470588236
+    },
+    {
+      "speaker": "user",
+      "text": "I will pay before the due date.",
+      "length": 31,
+      "startProgress": 0.40441176470588236,
+      "endProgress": 0.4424019607843137
+    },
+    {
+      "speaker": "agent",
+      "text": "That's great to hear अनुराग. Want me to walk you through the repayment process now or are you comfortable doing it yourself before the due date?",
+      "length": 144,
+      "startProgress": 0.4424019607843137,
+      "endProgress": 0.6188725490196079
+    },
+    {
+      "speaker": "user",
+      "text": "No, I will complete it before the due date by myself only.",
+      "length": 58,
+      "startProgress": 0.6188725490196079,
+      "endProgress": 0.6899509803921569
+    },
+    {
+      "speaker": "agent",
+      "text": "Sounds good अनुराग. 1 more thing. We've also got easy EMI options if that's ever useful. Interested? No no no no.",
+      "length": 113,
+      "startProgress": 0.6899509803921569,
+      "endProgress": 0.8284313725490196
+    },
+    {
+      "speaker": "user",
+      "text": "Perfect. Thanks",
+      "length": 15,
+      "startProgress": 0.8284313725490196,
+      "endProgress": 0.8468137254901961
+    },
+    {
+      "speaker": "agent",
+      "text": "for your time. Remember,",
+      "length": 24,
+      "startProgress": 0.8468137254901961,
+      "endProgress": 0.8762254901960784
+    },
+    {
+      "speaker": "user",
+      "text": "due date is in the next 2 days. Have a good 1.",
+      "length": 46,
+      "startProgress": 0.8762254901960784,
+      "endProgress": 0.9325980392156863
+    },
+    {
+      "speaker": "agent",
+      "text": "That's it from my side. Thank you, and have a nice day.",
+      "length": 55,
+      "startProgress": 0.9325980392156863,
+      "endProgress": 1
+    }
+  ],
+  "Copy of fiaxe customer support_transcript.txt": [
+    {
+      "speaker": "agent",
+      "text": "Hello क्या मैं श्रुति जी से बात कर रही हूं?",
+      "length": 43,
+      "startProgress": 0,
+      "endProgress": 0.08548707753479125
+    },
+    {
+      "speaker": "user",
+      "text": "जी बोलिए.",
+      "length": 9,
+      "startProgress": 0.08548707753479125,
+      "endProgress": 0.1033797216699801
+    },
+    {
+      "speaker": "agent",
+      "text": "नमस्कार श्रुति जी. मैं से नेहा बोल रही हूं. यह call आपके order number के बारे में है. क्या आपसे दो minute बात हो सकती है?",
+      "length": 121,
+      "startProgress": 0.1033797216699801,
+      "endProgress": 0.3439363817097415
+    },
+    {
+      "speaker": "user",
+      "text": "जी बोलिए.",
+      "length": 9,
+      "startProgress": 0.3439363817097415,
+      "endProgress": 0.3618290258449304
+    },
+    {
+      "speaker": "agent",
+      "text": "हमारे records में इस order की delivery fail दिख रही है. क्या delivery boy आपके address पर आया था?",
+      "length": 97,
+      "startProgress": 0.3618290258449304,
+      "endProgress": 0.5546719681908548
+    },
+    {
+      "speaker": "user",
+      "text": "हां वह आया था पर उस समय मैं घर पर नहीं थी.",
+      "length": 42,
+      "startProgress": 0.5546719681908548,
+      "endProgress": 0.6381709741550695
+    },
+    {
+      "speaker": "agent",
+      "text": "Ok. आपको delivery किस date पर चाहिए?",
+      "length": 36,
+      "startProgress": 0.6381709741550695,
+      "endProgress": 0.709741550695825
+    },
+    {
+      "speaker": "user",
+      "text": "परसों हो सकती है.",
+      "length": 17,
+      "startProgress": 0.709741550695825,
+      "endProgress": 0.7435387673956262
+    },
+    {
+      "speaker": "agent",
+      "text": "आपकी delivery परसों को कर दी जाएगी. क्या कुछ और मदद चाहिए?",
+      "length": 58,
+      "startProgress": 0.7435387673956262,
+      "endProgress": 0.8588469184890656
+    },
+    {
+      "speaker": "user",
+      "text": "नहीं, thank you.",
+      "length": 16,
+      "startProgress": 0.8588469184890656,
+      "endProgress": 0.8906560636182902
+    },
+    {
+      "speaker": "agent",
+      "text": "Fiat से shopping करने के लिए शुक्रिया. आपका दिन शुभ हो.",
+      "length": 55,
+      "startProgress": 0.8906560636182902,
+      "endProgress": 0.9999999999999999
+    }
+  ],
+  "Copy of lead qualification_transcript.txt": [
+    {
+      "speaker": "agent",
+      "text": "Hello. Am I speaking with भव्या?",
+      "length": 32,
+      "startProgress": 0,
+      "endProgress": 0.06095238095238095
+    },
+    {
+      "speaker": "user",
+      "text": "Yes.",
+      "length": 4,
+      "startProgress": 0.06095238095238095,
+      "endProgress": 0.06857142857142857
+    },
+    {
+      "speaker": "agent",
+      "text": "Certainly भव्या. I would just like to note down a couple of quick details. May I ask, have you completed your graduation?",
+      "length": 121,
+      "startProgress": 0.06857142857142857,
+      "endProgress": 0.29904761904761906
+    },
+    {
+      "speaker": "user",
+      "text": "Yeah, I have completed my graduation last year.",
+      "length": 47,
+      "startProgress": 0.29904761904761906,
+      "endProgress": 0.38857142857142857
+    },
+    {
+      "speaker": "agent",
+      "text": "Noted. Thank you. And which stream of course have you graduated in?",
+      "length": 67,
+      "startProgress": 0.38857142857142857,
+      "endProgress": 0.5161904761904762
+    },
+    {
+      "speaker": "user",
+      "text": "Computer science.",
+      "length": 17,
+      "startProgress": 0.5161904761904762,
+      "endProgress": 0.5485714285714286
+    },
+    {
+      "speaker": "agent",
+      "text": "Noted and 1 last thing, should you join CX business school, would you be requiring the hostel facility?",
+      "length": 103,
+      "startProgress": 0.5485714285714286,
+      "endProgress": 0.7447619047619047
+    },
+    {
+      "speaker": "user",
+      "text": "No.",
+      "length": 3,
+      "startProgress": 0.7447619047619047,
+      "endProgress": 0.7504761904761904
+    },
+    {
+      "speaker": "agent",
+      "text": "Noted. Thank you for your time today. Our senior counselor will reach out to you regarding more information. Have a nice day ahead.",
+      "length": 131,
+      "startProgress": 0.7504761904761904,
+      "endProgress": 1
+    }
+  ],
+  "Copy of poker_transcript.txt": [
+    {
+      "speaker": "agent",
+      "text": "Hello. Am I speaking with प्रशांत?",
+      "length": 34,
+      "startProgress": 0,
+      "endProgress": 0.04576043068640646
+    },
+    {
+      "speaker": "user",
+      "text": "Yes.",
+      "length": 4,
+      "startProgress": 0.04576043068640646,
+      "endProgress": 0.05114401076716016
+    },
+    {
+      "speaker": "agent",
+      "text": "Hello प्रशांत. This is अंजलि from Feiax Spoker. Is now a good time to talk?",
+      "length": 75,
+      "startProgress": 0.05114401076716016,
+      "endProgress": 0.15208613728129206
+    },
+    {
+      "speaker": "user",
+      "text": "Yeah. Go ahead.",
+      "length": 15,
+      "startProgress": 0.15208613728129206,
+      "endProgress": 0.17227456258411844
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you. You've been a regular player with us, and I have a quick survey that will take only 2 to 3 minutes.",
+      "length": 110,
+      "startProgress": 0.17227456258411844,
+      "endProgress": 0.32032301480484526
+    },
+    {
+      "speaker": "user",
+      "text": "So,",
+      "length": 3,
+      "startProgress": 0.32032301480484526,
+      "endProgress": 0.32436069986541055
+    },
+    {
+      "speaker": "agent",
+      "text": "is that ok?",
+      "length": 11,
+      "startProgress": 0.32436069986541055,
+      "endProgress": 0.33916554508748326
+    },
+    {
+      "speaker": "user",
+      "text": "Yeah, sure.",
+      "length": 11,
+      "startProgress": 0.33916554508748326,
+      "endProgress": 0.35397039030955596
+    },
+    {
+      "speaker": "agent",
+      "text": "Is सियाक's poker app stop real money games and you could only play free games with friends or on leader boards, would you still use the app?",
+      "length": 140,
+      "startProgress": 0.35397039030955596,
+      "endProgress": 0.5423956931359355
+    },
+    {
+      "speaker": "user",
+      "text": "Yeah, most probably.",
+      "length": 20,
+      "startProgress": 0.5423956931359355,
+      "endProgress": 0.569313593539704
+    },
+    {
+      "speaker": "agent",
+      "text": "Got it. Moving on to the next question. Would you be interested in offline poker tournaments held in your city or area?",
+      "length": 119,
+      "startProgress": 0.569313593539704,
+      "endProgress": 0.7294751009421266
+    },
+    {
+      "speaker": "user",
+      "text": "Yeah, maybe.",
+      "length": 12,
+      "startProgress": 0.7294751009421266,
+      "endProgress": 0.7456258411843878
+    },
+    {
+      "speaker": "agent",
+      "text": "Ok and moving on to the next question. May I please know your city or area to help us plan these events better?",
+      "length": 111,
+      "startProgress": 0.7456258411843878,
+      "endProgress": 0.8950201884253031
+    },
+    {
+      "speaker": "user",
+      "text": "So, I'm based in Mumbai.",
+      "length": 24,
+      "startProgress": 0.8950201884253031,
+      "endProgress": 0.9273216689098253
+    },
+    {
+      "speaker": "agent",
+      "text": "That's it from my side. Thank you and have a nice day.",
+      "length": 54,
+      "startProgress": 0.9273216689098253,
+      "endProgress": 1.0000000000000002
+    }
+  ],
+  "Copy of recruitment bot_transcript.txt": [
+    {
+      "speaker": "agent",
+      "text": "Hello अनुराग, hope you are doing great. Before continuing, are you comfortable continuing in हिंदी or english?",
+      "length": 110,
+      "startProgress": 0,
+      "endProgress": 0.05623721881390593
+    },
+    {
+      "speaker": "user",
+      "text": "हिंदी में बात करना है मुझको.",
+      "length": 28,
+      "startProgress": 0.05623721881390593,
+      "endProgress": 0.0705521472392638
+    },
+    {
+      "speaker": "agent",
+      "text": "React native developer role के लिए apply करने के लिए धन्यवाद.",
+      "length": 61,
+      "startProgress": 0.0705521472392638,
+      "endProgress": 0.10173824130879346
+    },
+    {
+      "speaker": "user",
+      "text": "मैं आपके experience को बेहतर तरीके से समझने के लिए आपसे बात करना चाहती हूं. क्या अभी बात करने का सही समय है?",
+      "length": 108,
+      "startProgress": 0.10173824130879346,
+      "endProgress": 0.15695296523517382
+    },
+    {
+      "speaker": "agent",
+      "text": "जी जी बताइए ना.",
+      "length": 15,
+      "startProgress": 0.15695296523517382,
+      "endProgress": 0.16462167689161555
+    },
+    {
+      "speaker": "user",
+      "text": "बढ़िया, चलिए शुरू करते हैं.",
+      "length": 27,
+      "startProgress": 0.16462167689161555,
+      "endProgress": 0.17842535787321065
+    },
+    {
+      "speaker": "agent",
+      "text": "जी?",
+      "length": 3,
+      "startProgress": 0.17842535787321065,
+      "endProgress": 0.17995910020449898
+    },
+    {
+      "speaker": "user",
+      "text": "यह एक remote full time opportunity है. क्या यह आपके लिए ठीक रहेगा? हां हां बिल्कुल सही रहेगा.",
+      "length": 93,
+      "startProgress": 0.17995910020449898,
+      "endProgress": 0.22750511247443764
+    },
+    {
+      "speaker": "agent",
+      "text": "समझ गई. आपका notice period कितना है?",
+      "length": 36,
+      "startProgress": 0.22750511247443764,
+      "endProgress": 0.24591002044989776
+    },
+    {
+      "speaker": "user",
+      "text": "Notice period मेरा पंद्रह दिन का है.",
+      "length": 36,
+      "startProgress": 0.24591002044989776,
+      "endProgress": 0.26431492842535786
+    },
+    {
+      "speaker": "agent",
+      "text": "धन्यवाद. आपका current CTC क्या है और आपकी expected CTC कितनी है?",
+      "length": 64,
+      "startProgress": 0.26431492842535786,
+      "endProgress": 0.29703476482617586
+    },
+    {
+      "speaker": "user",
+      "text": "Current मेरा अभी सात लाख है और expect करूंगा मैं आठ लाख का.",
+      "length": 59,
+      "startProgress": 0.29703476482617586,
+      "endProgress": 0.3271983640081799
+    },
+    {
+      "speaker": "agent",
+      "text": "बढ़िया, समझ गई. क्या आप किसी ऐसे project के बारे में बता सकते हैं जिसमें आपने React native का इस्तेमाल किया हो? उसमें आपकी key contributions",
+      "length": 140,
+      "startProgress": 0.3271983640081799,
+      "endProgress": 0.3987730061349693
+    },
+    {
+      "speaker": "user",
+      "text": "क्या थी और किन challenges का सामना करना पड़ा?",
+      "length": 45,
+      "startProgress": 0.3987730061349693,
+      "endProgress": 0.42177914110429443
+    },
+    {
+      "speaker": "agent",
+      "text": "Basically मैंने एक hospital management app बनाया था जिसमें मैंने",
+      "length": 64,
+      "startProgress": 0.42177914110429443,
+      "endProgress": 0.4544989775051124
+    },
+    {
+      "speaker": "user",
+      "text": "उसमें live updates रखे गए of beds और basically मुझे problems सबसे ज़्यादा live updates में ही हुई थी.",
+      "length": 101,
+      "startProgress": 0.4544989775051124,
+      "endProgress": 0.5061349693251533
+    },
+    {
+      "speaker": "agent",
+      "text": "समझ गई. तो आपने hospital management app में live updates को implement करने में कुछ challenges का सामना किया, लेकिन आपने उसे कैसे resolve किया?",
+      "length": 142,
+      "startProgress": 0.5061349693251533,
+      "endProgress": 0.5787321063394683
+    },
+    {
+      "speaker": "user",
+      "text": "Basically मैंने React का use किया और काफ़ी सारे tools का use किया जिससे वह ठीक हुआ.",
+      "length": 83,
+      "startProgress": 0.5787321063394683,
+      "endProgress": 0.6211656441717791
+    },
+    {
+      "speaker": "agent",
+      "text": "बढ़िया.",
+      "length": 7,
+      "startProgress": 0.6211656441717791,
+      "endProgress": 0.6247443762781186
+    },
+    {
+      "speaker": "user",
+      "text": "अच्छा सुनने में आया कि आपने अपनी समस्या का समाधान निकाल लिया. अच्छा JavaScript ES 6 और types script के beach मुख्य अंतर क्या हैं?",
+      "length": 129,
+      "startProgress": 0.6247443762781186,
+      "endProgress": 0.6906952965235174
+    },
+    {
+      "speaker": "agent",
+      "text": "मुझे ज़्यादा तो नहीं पता पर इतना पता है कि types basically variables का type check करता है और JavaScript वह नहीं करता.",
+      "length": 118,
+      "startProgress": 0.6906952965235174,
+      "endProgress": 0.7510224948875255
+    },
+    {
+      "speaker": "user",
+      "text": "ठीक है. आपको कुछ idea है कि types script में type checking का क्या महत्व है? एक और बात यह है कि types script में आप अपने code में type annotation जोड़ सकते हैं. जो कि आपके code को अधिक सुरक्षित और maintainable बनता है. बढ़िया. बातचीत ख़त्म करने से पहले क्या मैं जान सकती हूं कि आप इस समय किस company में हैं?",
+      "length": 308,
+      "startProgress": 0.7510224948875255,
+      "endProgress": 0.9084867075664621
+    },
+    {
+      "speaker": "agent",
+      "text": "CX में.",
+      "length": 7,
+      "startProgress": 0.9084867075664621,
+      "endProgress": 0.9120654396728016
+    },
+    {
+      "speaker": "user",
+      "text": "सभी सवालों के जवाब देने के लिए धन्यवाद. हम आपके जवाब review करेंगे और अगर आप shortlist होते हैं तो हम जल्द ही आपसे संपर्क करेंगे.",
+      "length": 129,
+      "startProgress": 0.9120654396728016,
+      "endProgress": 0.9780163599182004
+    },
+    {
+      "speaker": "agent",
+      "text": "ठीक है, thank you.",
+      "length": 18,
+      "startProgress": 0.9780163599182004,
+      "endProgress": 0.9872188139059304
+    },
+    {
+      "speaker": "user",
+      "text": "धन्यवाद, आपका दिन शुभ हो.",
+      "length": 25,
+      "startProgress": 0.9872188139059304,
+      "endProgress": 0.9999999999999999
+    }
+  ],
+  "Copy of wedding_transcript.txt": [
+    {
+      "speaker": "agent",
+      "text": "Hi. This is माया from Feiax wedding venue services. Before we proceed, would you like to continue the conversation in English or हिंदी?",
+      "length": 135,
+      "startProgress": 0,
+      "endProgress": 0.11862917398945519
+    },
+    {
+      "speaker": "user",
+      "text": "English.",
+      "length": 8,
+      "startProgress": 0.11862917398945519,
+      "endProgress": 0.1256590509666081
+    },
+    {
+      "speaker": "agent",
+      "text": "Great. So how can I help you today in new booking, checking on an existing 1 or want to hear about our services?",
+      "length": 112,
+      "startProgress": 0.1256590509666081,
+      "endProgress": 0.22407732864674867
+    },
+    {
+      "speaker": "user",
+      "text": "I want to make a new booking.",
+      "length": 29,
+      "startProgress": 0.22407732864674867,
+      "endProgress": 0.24956063268892795
+    },
+    {
+      "speaker": "agent",
+      "text": "What date or rough timing are you thinking of for the wedding?",
+      "length": 62,
+      "startProgress": 0.24956063268892795,
+      "endProgress": 0.30404217926186294
+    },
+    {
+      "speaker": "user",
+      "text": "So I am thinking the 7th of July around 7PM.",
+      "length": 44,
+      "startProgress": 0.30404217926186294,
+      "endProgress": 0.3427065026362039
+    },
+    {
+      "speaker": "agent",
+      "text": "Got it. So July 7th around 7PM",
+      "length": 30,
+      "startProgress": 0.3427065026362039,
+      "endProgress": 0.36906854130052724
+    },
+    {
+      "speaker": "user",
+      "text": "and roughly how many guests are you expecting?",
+      "length": 46,
+      "startProgress": 0.36906854130052724,
+      "endProgress": 0.4094903339191564
+    },
+    {
+      "speaker": "agent",
+      "text": "707",
+      "length": 3,
+      "startProgress": 0.4094903339191564,
+      "endProgress": 0.4121265377855887
+    },
+    {
+      "speaker": "user",
+      "text": "hundred guests. Is this just a wedding day or are there other functions too, like महिंदी or संगीत?",
+      "length": 98,
+      "startProgress": 0.4121265377855887,
+      "endProgress": 0.49824253075571173
+    },
+    {
+      "speaker": "agent",
+      "text": "There'll be multiple functions held on the same day.",
+      "length": 52,
+      "startProgress": 0.49824253075571173,
+      "endProgress": 0.5439367311072056
+    },
+    {
+      "speaker": "user",
+      "text": "So multiple functions all on July 7th. Any particular theme, decor style, or entertainment you have in mind?",
+      "length": 108,
+      "startProgress": 0.5439367311072056,
+      "endProgress": 0.6388400702987698
+    },
+    {
+      "speaker": "agent",
+      "text": "Yeah. It'll be a masculine team.",
+      "length": 32,
+      "startProgress": 0.6388400702987698,
+      "endProgress": 0.6669595782073814
+    },
+    {
+      "speaker": "user",
+      "text": "So grand celebration with a large team involved. I'd love you to come see the venue in person. We're open 9 to 5 any day works.",
+      "length": 127,
+      "startProgress": 0.6669595782073814,
+      "endProgress": 0.7785588752196837
+    },
+    {
+      "speaker": "agent",
+      "text": "Anything else I can help with?",
+      "length": 30,
+      "startProgress": 0.7785588752196837,
+      "endProgress": 0.8049209138840071
+    },
+    {
+      "speaker": "user",
+      "text": "Ok, can I come down next Thursday?",
+      "length": 34,
+      "startProgress": 0.8049209138840071,
+      "endProgress": 0.8347978910369069
+    },
+    {
+      "speaker": "agent",
+      "text": "Next Thursday works perfectly. Shall we say around 2PM? I'll make sure to have everything ready for you. Anything else I can help with?",
+      "length": 135,
+      "startProgress": 0.8347978910369069,
+      "endProgress": 0.9534270650263621
+    },
+    {
+      "speaker": "user",
+      "text": "That's it from my side. Thank you. Have a lovely day.",
+      "length": 53,
+      "startProgress": 0.9534270650263621,
+      "endProgress": 1
+    }
+  ],
+  "Copy of weirdo_transcript.txt": [
+    {
+      "speaker": "agent",
+      "text": "Hello.",
+      "length": 6,
+      "startProgress": 0,
+      "endProgress": 0.008086253369272238
+    },
+    {
+      "speaker": "user",
+      "text": "नमस्ते.",
+      "length": 7,
+      "startProgress": 0.008086253369272238,
+      "endProgress": 0.01752021563342318
+    },
+    {
+      "speaker": "agent",
+      "text": "मैं नेहा से",
+      "length": 11,
+      "startProgress": 0.01752021563342318,
+      "endProgress": 0.03234501347708895
+    },
+    {
+      "speaker": "user",
+      "text": "आपकी किस तरह मदद कर सकती हूं?",
+      "length": 29,
+      "startProgress": 0.03234501347708895,
+      "endProgress": 0.07142857142857142
+    },
+    {
+      "speaker": "agent",
+      "text": "मुझे अपना order reschedule करवाना है.",
+      "length": 37,
+      "startProgress": 0.07142857142857142,
+      "endProgress": 0.12129380053908356
+    },
+    {
+      "speaker": "user",
+      "text": "समझ गई जी. क्या मैं आपका order number जान सकती हूं?",
+      "length": 51,
+      "startProgress": 0.12129380053908356,
+      "endProgress": 0.19002695417789758
+    },
+    {
+      "speaker": "agent",
+      "text": "एक",
+      "length": 2,
+      "startProgress": 0.19002695417789758,
+      "endProgress": 0.192722371967655
+    },
+    {
+      "speaker": "user",
+      "text": "minute.",
+      "length": 7,
+      "startProgress": 0.192722371967655,
+      "endProgress": 0.20215633423180593
+    },
+    {
+      "speaker": "agent",
+      "text": "ठीक है.",
+      "length": 7,
+      "startProgress": 0.20215633423180593,
+      "endProgress": 0.21159029649595687
+    },
+    {
+      "speaker": "user",
+      "text": "आपका order number क्या है?",
+      "length": 26,
+      "startProgress": 0.21159029649595687,
+      "endProgress": 0.24663072776280323
+    },
+    {
+      "speaker": "agent",
+      "text": "A1234.",
+      "length": 6,
+      "startProgress": 0.24663072776280323,
+      "endProgress": 0.25471698113207547
+    },
+    {
+      "speaker": "user",
+      "text": "ठीक है. आपका order number 1234",
+      "length": 30,
+      "startProgress": 0.25471698113207547,
+      "endProgress": 0.29514824797843664
+    },
+    {
+      "speaker": "agent",
+      "text": "है. क्या आपको पता है कि आपका order कितने दिन पहले deliver होने वाला था?",
+      "length": 71,
+      "startProgress": 0.29514824797843664,
+      "endProgress": 0.3908355795148248
+    },
+    {
+      "speaker": "user",
+      "text": "मुझे याद नहीं है.",
+      "length": 17,
+      "startProgress": 0.3908355795148248,
+      "endProgress": 0.4137466307277628
+    },
+    {
+      "speaker": "agent",
+      "text": "समझ गई. क्या आपको कोई delivery attempt या notification मिली थी?",
+      "length": 63,
+      "startProgress": 0.4137466307277628,
+      "endProgress": 0.49865229110512127
+    },
+    {
+      "speaker": "user",
+      "text": "नहीं.",
+      "length": 5,
+      "startProgress": 0.49865229110512127,
+      "endProgress": 0.5053908355795148
+    },
+    {
+      "speaker": "agent",
+      "text": "ठीक है. तो शायद आपका order गलत तरीके से mark हो गया है. क्या आप अपना order reschedule करना चाहते हैं या cancel करना चाहते हैं? मुझे reschedule करना है.",
+      "length": 151,
+      "startProgress": 0.5053908355795148,
+      "endProgress": 0.7088948787061995
+    },
+    {
+      "speaker": "user",
+      "text": "जी बिल्कुल. आप order reschedule कर सकते हैं. आप किस दिन reschedule करना चाहते हैं?",
+      "length": 82,
+      "startProgress": 0.7088948787061995,
+      "endProgress": 0.8194070080862534
+    },
+    {
+      "speaker": "agent",
+      "text": "कल हो सकता है.",
+      "length": 14,
+      "startProgress": 0.8194070080862534,
+      "endProgress": 0.8382749326145553
+    },
+    {
+      "speaker": "user",
+      "text": "ठीक है. आपका order कल के लिए reschedule कर दिया गया है.",
+      "length": 55,
+      "startProgress": 0.8382749326145553,
+      "endProgress": 0.9123989218328842
+    },
+    {
+      "speaker": "agent",
+      "text": "Thank you.",
+      "length": 10,
+      "startProgress": 0.9123989218328842,
+      "endProgress": 0.9258760107816713
+    },
+    {
+      "speaker": "user",
+      "text": "Viedo से shopping करने के लिए धन्यवाद. आपका दिन शुभ हो.",
+      "length": 55,
+      "startProgress": 0.9258760107816713,
+      "endProgress": 1
+    }
+  ]
+}

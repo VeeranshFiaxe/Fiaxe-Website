@@ -1,8 +1,9 @@
 // Cloudflare Worker that fronts the static export in `out/`.
 //
-// Everything except /api/* is served straight from Workers Static Assets
-// without invoking this script (see `assets.run_worker_first` in
-// wrangler.jsonc). The two API paths are the n8n proxies that a static export
+// Requests under /_next/* are served straight from Workers Static Assets
+// without invoking this script; everything else runs the Worker first (see
+// `assets.run_worker_first` in wrangler.jsonc) so the www redirect below sees
+// real navigations. The two API paths are the n8n proxies that a static export
 // cannot emit on its own.
 
 import { proxyBookDemo, proxyCareers } from "../lib/webhook-proxy";
@@ -11,23 +12,39 @@ import { proxyBookDemo, proxyCareers } from "../lib/webhook-proxy";
 // type-checks under the Next.js tsconfig without pulling in workers-types.
 interface Env {
   ASSETS: { fetch(request: Request): Promise<Response> };
+  // URL of worker/n8n-forwarder.ts. See lib/webhook-proxy.ts for why the n8n
+  // call cannot be made from this Worker directly.
+  N8N_FORWARD_URL: string;
 }
 
-const ROUTES: Record<string, (request: Request) => Promise<Response>> = {
+const ROUTES: Record<
+  string,
+  (request: Request, forwardUrl: string) => Promise<Response>
+> = {
   "/api/book-demo": proxyBookDemo,
   "/api/careers": proxyCareers,
 };
 
-// The staging and workers.dev hostnames serve a byte-identical copy of the
-// production site. Left crawlable they would compete with fiaxe.com in search,
-// so they get a disallow-all robots.txt instead of the one Next.js generates.
+// The workers.dev hostname serves a byte-identical copy of the production
+// site. Left crawlable it would compete with fiaxe.com in search, so it gets
+// a disallow-all robots.txt instead of the one Next.js generates.
 function isNonCanonicalHost(hostname: string): boolean {
-  return hostname.startsWith("staging.") || hostname.endsWith(".workers.dev");
+  return hostname.endsWith(".workers.dev");
 }
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    // The apex is canonical: sitemap.xml, the metadataBase in app/layout.tsx
+    // and the Schema.org blocks all point at it. www is a custom domain on
+    // this same Worker, so redirect rather than serve to keep it from becoming
+    // a duplicate of the same content. 308 preserves method and body, so the
+    // /api/* POSTs survive the hop.
+    if (url.hostname === "www.fiaxe.com") {
+      url.hostname = "fiaxe.com";
+      return Response.redirect(url.toString(), 308);
+    }
 
     if (url.pathname === "/robots.txt" && isNonCanonicalHost(url.hostname)) {
       return new Response("User-agent: *\nDisallow: /\n", {
@@ -47,7 +64,7 @@ export default {
           headers: { allow: "POST" },
         });
       }
-      return handler(request);
+      return handler(request, env.N8N_FORWARD_URL);
     }
 
     // Anything the asset router did not match falls through to here.

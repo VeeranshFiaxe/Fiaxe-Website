@@ -8,9 +8,13 @@
   "account_id": "bc179c6141c15f2b2f69a8615300724b",
   "compatibility_date": "2026-08-11",
 
-  // Staging only. The apex and www still serve the Framer site; do not add
-  // fiaxe.com here until that cutover is deliberate.
-  "routes": [{ "pattern": "staging.fiaxe.com", "custom_domain": true }],
+  // Production. Cutover 2026-09-03: these two custom domains replaced the
+  // Framer records the apex and www used to point at. The apex serves the
+  // site; www 308s to it from worker/index.ts.
+  "routes": [
+    { "pattern": "fiaxe.com", "custom_domain": true },
+    { "pattern": "www.fiaxe.com", "custom_domain": true }
+  ],
 
   // Adding `routes` turns the workers.dev URL off by default; keep it on so
   // fiaxe-website.xaif.workers.dev stays available as a fallback.
@@ -28,11 +32,21 @@
     // Next.js emits out/404.html.
     "not_found_handling": "404-page",
 
-    // Only the n8n proxies and robots.txt need the Worker; every other request
-    // is served straight from static assets without invoking it. robots.txt is
-    // here so staging/workers.dev can be served a disallow-all variant.
-    "run_worker_first": ["/api/*", "/robots.txt"]
+    // The Worker has to see real navigations to 308 www -> the apex, and
+    // Cloudflare matches these globs on path only, so it cannot be scoped to
+    // the www hostname. Everything runs the Worker first except /_next/*, the
+    // hashed JS/CSS bundle that is the bulk of the request volume. The cost is
+    // that a hotlinked /_next/* URL on www skips the redirect and serves the
+    // asset, which is harmless -- no HTML, nothing for a crawler to index.
+    "run_worker_first": ["/*", "!/_next/*"]
   },
+
+  // worker/n8n-forwarder.ts, deployed from wrangler.n8n-forwarder.jsonc. The
+  // /api/* handlers post here instead of straight to n8n, because a subrequest
+  // from this zone-bound Worker to n8n.fiaxe.com loops. Must stay an https://
+  // workers.dev URL: a service binding inherits this Worker's zone context and
+  // hits the same loop.
+  "vars": { "N8N_FORWARD_URL": "https://fiaxe-website-n8n-forwarder.xaif.workers.dev/" },
 
   "observability": { "enabled": true }
 }

@@ -8,13 +8,32 @@
 // It is written against the standard Request/Response types only, so the same
 // code runs unchanged in Node and on workerd.
 
-const WEBHOOK_URL = "https://n8n.fiaxe.com/webhook/6307d669-2cfb-403f-92b3-26754074f984";
+export const WEBHOOK_URL =
+  "https://n8n.fiaxe.com/webhook/6307d669-2cfb-403f-92b3-26754074f984";
 
 function json(body: unknown, status = 200): Response {
   return Response.json(body, { status });
 }
 
-export async function proxyBookDemo(request: Request): Promise<Response> {
+// On Workers, `forwardUrl` is worker/n8n-forwarder.ts and the payload takes an
+// extra HTTP hop: a subrequest from the zone-bound site Worker to n8n.fiaxe.com
+// is answered by the edge with a 307 back to the same URL, so fetch() loops
+// until it throws. The forwarder is not attached to the zone, so its own call
+// to n8n resolves normally. Under `next dev` there is no forwarder and no zone,
+// so callers pass nothing and we post to n8n directly.
+function postToWebhook(
+  body: BodyInit | null,
+  contentType: string,
+  forwardUrl?: string,
+): Promise<Response> {
+  return fetch(forwardUrl ?? WEBHOOK_URL, {
+    method: "POST",
+    headers: { "content-type": contentType },
+    body,
+  });
+}
+
+export async function proxyBookDemo(request: Request, forwardUrl?: string): Promise<Response> {
   try {
     const bodyText = await request.text();
     const contentType = request.headers.get("content-type") ?? "application/json";
@@ -28,11 +47,7 @@ export async function proxyBookDemo(request: Request): Promise<Response> {
       }
     } catch {}
 
-    const res = await fetch(WEBHOOK_URL, {
-      method: "POST",
-      headers: { "content-type": contentType },
-      body: bodyText,
-    });
+    const res = await postToWebhook(bodyText, contentType, forwardUrl);
 
     if (!res.ok) {
       const text = await res.text().catch(() => "");
@@ -47,7 +62,7 @@ export async function proxyBookDemo(request: Request): Promise<Response> {
   }
 }
 
-export async function proxyCareers(request: Request): Promise<Response> {
+export async function proxyCareers(request: Request, forwardUrl?: string): Promise<Response> {
   try {
     // Pass the raw multipart body straight through with its original
     // Content-Type (which carries the boundary). Re-parsing and re-building
@@ -56,11 +71,7 @@ export async function proxyCareers(request: Request): Promise<Response> {
     const body = await request.arrayBuffer();
     const contentType = request.headers.get("content-type") ?? "application/octet-stream";
 
-    const res = await fetch(WEBHOOK_URL, {
-      method: "POST",
-      headers: { "content-type": contentType },
-      body,
-    });
+    const res = await postToWebhook(body, contentType, forwardUrl);
 
     if (!res.ok) {
       // Surface n8n's real status + body so the failure is diagnosable.

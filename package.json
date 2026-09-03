@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "preview": "next build && wrangler dev",
-    "deploy": "next build && wrangler deploy"
+    "deploy": "next build && wrangler deploy -c wrangler.n8n-forwarder.jsonc && wrangler deploy"
   },
   "dependencies": {
     "motion": "^12.40.0",

@@ -5,6 +5,7 @@ import { Nav } from "@/components/Nav";
 import { Footer } from "@/components/Footer";
 import { InlineScript } from "@/components/InlineScript";
 import { Schema } from "@/components/Schema";
+import { SiteFx } from "@/components/site/SiteFx";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -14,32 +15,24 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://fiaxe.com"),
-  title: "Fiaxe | Voice AI Calling Agents That Sound Human",
+  title: "Fiaxe | Websites, Automation, Custom Tools & AI",
   description:
-    "Deploy human-like, multilingual voice AI agents for inbound and outbound calls. Wire directly into your CRM to build, test, and scale in minutes.",
-  keywords: [
-    "AI calling",
-    "voice AI",
-    "AI voice agents",
-    "outbound calling automation",
-    "AI phone calls",
-    "Fiaxe",
-  ],
+    "Placeholder: Fiaxe builds websites, automation, custom tools and AI products, and trains teams to use AI.",
+  keywords: ["Fiaxe", "website development", "automation", "custom tools", "AI training", "voice AI"],
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "Fiaxe | Voice AI Calling Agents That Sound Human",
-    description:
-      "Build, test, deploy, and scale conversational voice AI agents. Go from idea to live calls in minutes, not weeks.",
+    title: "Fiaxe | Websites, Automation, Custom Tools & AI",
+    description: "Placeholder: everything Fiaxe builds, in one place.",
     type: "website",
     siteName: "Fiaxe",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Fiaxe | Voice AI Calling Agents That Sound Human",
-    description: "Build, test, deploy, and scale conversational voice AI agents.",
+    title: "Fiaxe | Websites, Automation, Custom Tools & AI",
+    description: "Placeholder: everything Fiaxe builds, in one place.",
   },
   robots: {
     index: true,
@@ -62,7 +55,7 @@ export default function RootLayout({
       <head>
         {/* Dark is the FIAXE default; honor a saved preference if one exists. */}
         <InlineScript
-          html={`(function(){try{var t=localStorage.getItem("theme");document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){}})();`}
+          html={`(function(){try{var t=localStorage.getItem("theme");document.documentElement.setAttribute("data-theme",t==="light"?"light":"dark");}catch(e){}document.documentElement.classList.add("fx");})();`}
         />
         <Schema />
       </head>
@@ -70,6 +63,7 @@ export default function RootLayout({
         <Nav />
         <main className="flex-1">{children}</main>
         <Footer />
+        <SiteFx />
       </body>
     </html>
   );

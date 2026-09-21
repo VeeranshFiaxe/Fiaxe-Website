@@ -1,31 +1,21 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
+import { PRODUCTS, SERVICES, productHref, serviceHref } from "@/lib/catalog";
 
 const COLUMNS: { title: string; links: { label: string; href: string }[] }[] = [
   {
-    title: "Product",
-    links: [
-      { label: "What we build", href: "/#what-we-build" },
-      { label: "How it works", href: "/#how-it-works" },
-      { label: "Customer stories", href: "/customer-stories" },
-      { label: "FAQ", href: "/#faq" },
-    ],
+    title: "Services",
+    links: SERVICES.map((s) => ({ label: s.name, href: serviceHref(s) })),
   },
   {
-    title: "Explore",
-    links: [
-      { label: "AI agents", href: "/agents" },
-      { label: "Industries", href: "/customer-stories#industries" },
-      { label: "Pricing", href: "/pricing" },
-      { label: "Live demo", href: "/#live-demo" },
-      { label: "Fiaxe CRM", href: "/#crm" },
-    ],
+    title: "Products",
+    links: PRODUCTS.flatMap((p) => [{ label: p.name, href: productHref(p) }, ...(p.links ?? [])]),
   },
   {
     title: "Company",
     links: [
       { label: "Contact us", href: "/contact-us" },
-      { label: "Book a demo", href: "/contact-us" },
+      { label: "Book a call", href: "/contact-us" },
     ],
   },
   {
@@ -66,8 +56,7 @@ export function Footer() {
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
             <Logo />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-muted">
-              Voice AI agents for modern businesses, collections, reminders,
-              recruitment, lead qualification and support, integrated into your CRM.
+              Placeholder: websites, automation, custom tools, AI training and AI products for growing businesses.
             </p>
 
             <div className="mt-6 flex gap-2">
@@ -102,7 +91,7 @@ export function Footer() {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-line pt-8 md:flex-row">
           <p className="font-mono text-[11px] tracking-wider text-faint uppercase">
-            © {new Date().getFullYear()} Fiaxe, Every call, intelligent.
+            © {new Date().getFullYear()} Fiaxe
           </p>
           <p className="font-mono text-[11px] tracking-wider text-faint uppercase">
             Made in India

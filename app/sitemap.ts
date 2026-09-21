@@ -1,4 +1,5 @@
 import { MetadataRoute } from "next";
+import { PRODUCTS, SERVICES, productHref, serviceHref } from "@/lib/catalog";
 
 export const dynamic = "force-static";
 
@@ -8,6 +9,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Key static routes
   const routes = [
     "",
+    "/services",
+    ...SERVICES.map(serviceHref),
+    "/products",
+    ...PRODUCTS.map(productHref),
     "/agents",
     "/customer-stories",
     "/pricing",
@@ -22,6 +27,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}${route}`,
     lastModified: new Date(),
     changeFrequency: route === "" ? "weekly" : "monthly",
-    priority: route === "" ? 1 : route.includes("agents") || route.includes("pricing") ? 0.9 : 0.8,
+    priority: route === "" ? 1 : route.startsWith("/services") || route.startsWith("/products") ? 0.9 : 0.8,
   }));
 }

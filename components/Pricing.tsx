@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
-import { motion } from "motion/react";
-import { Reveal, SectionHeading, CountUp } from "./primitives";
+import { useState } from "react";
+import { Reveal, SectionHeading } from "./primitives";
+import { CountUp } from "./client";
 
 const TIERS = [
   { name: "Starter", rate: 8, minutes: 5000, desc: "For teams validating their first voice agent." },
@@ -30,20 +30,8 @@ const MAX_CALL_LENGTH = 10;
 const MINUTE_STOPS = [1000, 5000, 10000, 30000, 50000, 75000, 100000];
 const CALL_LENGTH_STOPS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
-function getRate(minutes: number): number {
-  if (minutes <= 5000) return 8;
-  if (minutes <= 10000) return 7.5;
-  if (minutes <= 30000) return 7;
-  if (minutes <= 50000) return 6.5;
-  return 6.5;
-}
-
-function getTier(minutes: number): string {
-  if (minutes <= 5000) return "Starter";
-  if (minutes <= 10000) return "Grow";
-  if (minutes <= 30000) return "Pro";
-  return "Enterprise";
-}
+// The first tier whose bundle covers the volume; Enterprise above that.
+const tierFor = (minutes: number) => TIERS.find((t) => minutes <= t.minutes) ?? TIERS[TIERS.length - 1];
 
 function formatNum(n: number): string {
   if (n >= 1000) {
@@ -113,27 +101,16 @@ export function Pricing() {
   const [minutes, setMinutes] = useState(5000);
   const [callLength, setCallLength] = useState(3);
 
-  const rate = useMemo(() => getRate(minutes), [minutes]);
-  const monthlyCost = useMemo(() => Math.round(rate * minutes), [minutes, rate]);
-  const numberOfCalls = useMemo(() => Math.round(minutes / callLength), [minutes, callLength]);
-  const tier = useMemo(() => getTier(minutes), [minutes]);
-
-  const minuteFill = useMemo(
-    () => ((minutes - MIN_MINUTES) / (MAX_MINUTES - MIN_MINUTES)) * 100,
-    [minutes],
-  );
-  const callLengthFill = useMemo(
-    () => ((callLength - MIN_CALL_LENGTH) / (MAX_CALL_LENGTH - MIN_CALL_LENGTH)) * 100,
-    [callLength],
-  );
+  const { name: tier, rate } = tierFor(minutes);
+  const monthlyCost = Math.round(rate * minutes);
+  const numberOfCalls = Math.round(minutes / callLength);
+  const minuteFill = ((minutes - MIN_MINUTES) / (MAX_MINUTES - MIN_MINUTES)) * 100;
+  const callLengthFill = ((callLength - MIN_CALL_LENGTH) / (MAX_CALL_LENGTH - MIN_CALL_LENGTH)) * 100;
 
   return (
     <section id="pricing" className="mx-auto max-w-7xl px-5 pt-10 pb-6 md:px-8 md:pt-16 md:pb-8">
       <SectionHeading
         as="h1"
-        index="01"
-        label="Pricing"
-        rightMeta="Per-minute · No seat licenses"
         title={
           <>
             Pricing that scales <span className="underline-bar">with your calls.</span>
@@ -143,7 +120,7 @@ export function Pricing() {
       />
 
       {/* Tier cards */}
-      <Reveal>
+      <Reveal onLoad delay={0.2}>
         <div className="grid grid-cols-2 gap-5 lg:grid-cols-4">
           {TIERS.map((t) => (
             <div key={t.name} className="flex flex-col rounded-2xl border border-line bg-ink p-5 shadow-sm sm:p-7">
@@ -173,14 +150,13 @@ export function Pricing() {
         <div className="mt-12 rounded-2xl border border-line bg-ink p-6 sm:p-8 md:mt-16 lg:p-10">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <span className="mono-label !text-cream">Volume calculator</span>
-            <motion.span
+            <span
               key={tier}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="rounded-full border border-line px-3 py-1 font-mono text-[10px] tracking-wider text-blue uppercase"
+              style={{ "--y": "0px" } as React.CSSProperties}
+              className="fade-up rounded-full border border-line px-3 py-1 font-mono text-[10px] tracking-wider text-blue uppercase"
             >
               {tier} tier
-            </motion.span>
+            </span>
           </div>
 
           <p className="mt-3 font-display text-xl font-medium tracking-tight sm:text-2xl">
@@ -254,28 +230,28 @@ export function Pricing() {
 
           {/* Big metric cards */}
           <div className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4">
-            <motion.div layout className="rounded-xl border border-line bg-ink-2 p-4 text-center">
+            <div className="rounded-xl border border-line bg-ink-2 p-4 text-center">
               <p className="font-mono text-[10px] tracking-wider text-faint uppercase">Rate</p>
               <p className="mt-1.5 font-display text-2xl font-medium tracking-tight text-blue">
                 ₹<CountUp value={rate} decimals={rate % 1 === 0 ? 0 : 1} />
               </p>
               <p className="mt-1 font-mono text-[10px] text-faint">per minute</p>
-            </motion.div>
-            <motion.div layout className="rounded-xl border border-line bg-ink-2 p-4 text-center">
+            </div>
+            <div className="rounded-xl border border-line bg-ink-2 p-4 text-center">
               <p className="font-mono text-[10px] tracking-wider text-faint uppercase">Volume</p>
               <p className="mt-1.5 font-display text-2xl font-medium tracking-tight">
                 <CountUp value={minutes} />
               </p>
               <p className="mt-1 font-mono text-[10px] text-faint">minutes / month</p>
-            </motion.div>
-            <motion.div layout className="rounded-xl border border-line bg-ink-2 p-4 text-center">
+            </div>
+            <div className="rounded-xl border border-line bg-ink-2 p-4 text-center">
               <p className="font-mono text-[10px] tracking-wider text-faint uppercase">Calls</p>
               <p className="mt-1.5 font-display text-2xl font-medium tracking-tight">
                 <CountUp value={numberOfCalls} />
               </p>
               <p className="mt-1 font-mono text-[10px] text-faint">calls / month</p>
-            </motion.div>
-            <motion.div layout className="rounded-xl border border-line bg-ink-2 p-4 text-center">
+            </div>
+            <div className="rounded-xl border border-line bg-ink-2 p-4 text-center">
               <p className="font-mono text-[10px] tracking-wider text-faint uppercase">Estimated cost</p>
               <p className="mt-1.5 font-display text-2xl font-medium tracking-tight">
                 ₹<CountUp value={monthlyCost} />
@@ -283,7 +259,7 @@ export function Pricing() {
               <p className="mt-1 font-mono text-[10px] text-faint">
                 {formatNum(minutes)} mins × ₹{rate}/min = ~{formatNum(numberOfCalls)} calls
               </p>
-            </motion.div>
+            </div>
           </div>
 
           {/* Tier comparison bar */}
@@ -292,7 +268,8 @@ export function Pricing() {
               {TIERS.map((t) => {
                 const isActive = t.name === tier;
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={t.name}
                     onClick={() => setMinutes(t.minutes)}
                     className={`flex-1 cursor-pointer border-r border-line px-2 py-3 transition-colors last:border-r-0 ${
@@ -305,7 +282,7 @@ export function Pricing() {
                     <p className={`mt-0.5 font-display text-sm font-medium tracking-tight ${isActive ? "text-blue" : "text-cream"}`}>
                       ₹{t.rate}/min
                     </p>
-                  </div>
+                  </button>
                 );
               })}
             </div>

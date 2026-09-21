@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { utmParams } from "@/lib/utm";
 import { Reveal } from "./primitives";
 
 const ROLES = [
@@ -25,29 +26,13 @@ type Status = "idle" | "sending" | "success" | "error";
 export function CareersForm() {
   const [status, setStatus] = useState<Status>("idle");
   const [fileName, setFileName] = useState<string>("");
-  const [utm, setUtm] = useState<Record<string, string>>({});
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setUtm({
-      utm_source: params.get("utm_source") || "",
-      utm_medium: params.get("utm_medium") || "",
-      utm_campaign: params.get("utm_campaign") || "",
-      utm_term: params.get("utm_term") || "",
-      utm_content: params.get("utm_content") || "",
-    });
-  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const data = new FormData(form);
     data.append("page", "carrerpage");
-    data.append("utm_source", utm.utm_source);
-    data.append("utm_medium", utm.utm_medium);
-    data.append("utm_campaign", utm.utm_campaign);
-    data.append("utm_term", utm.utm_term);
-    data.append("utm_content", utm.utm_content);
+    for (const [k, v] of Object.entries(utmParams())) data.append(k, v);
 
     setStatus("sending");
     try {

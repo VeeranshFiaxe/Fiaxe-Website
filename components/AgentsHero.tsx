@@ -13,18 +13,18 @@ export function AgentsHero() {
   return (
     <section className="relative pt-28 pb-4 md:pt-36">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
-        <Reveal>
+        <Reveal onLoad>
           <h1 className="max-w-4xl font-display text-5xl font-medium leading-[1.05] tracking-tight text-balance md:text-[4rem]">
             Agents that do more <span className="underline-bar">than just talk.</span>
           </h1>
         </Reveal>
-        <Reveal delay={0.14}>
+        <Reveal onLoad delay={0.14}>
           <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted text-pretty">
             Deploy production-ready voice agents that understand context, speak your customer&apos;s
             language, and deliver business outcomes, without expanding your team.
           </p>
         </Reveal>
-        <Reveal delay={0.2}>
+        <Reveal onLoad delay={0.2}>
           <dl className="mt-12 grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line md:mt-14 md:grid-cols-4">
             {STATS.map((s) => (
               <div key={s.label} className="flex flex-col gap-2 bg-ink p-6 md:p-7">

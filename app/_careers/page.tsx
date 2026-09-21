@@ -20,8 +20,6 @@ export default function CareersPage() {
   return (
     <>
       <PageHero
-        index="00"
-        label="Careers"
         title={
           <>
             Build the future of <span className="underline-bar">business conversations.</span>

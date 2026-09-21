@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { motion, useReducedMotion } from "motion/react";
 import { Reveal } from "./primitives";
 
 const FAQS: { q: string; a: string }[] = [
@@ -42,7 +41,6 @@ const FAQS: { q: string; a: string }[] = [
 
 export function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
-  const reduce = useReducedMotion();
 
   return (
     <section id="faq" className="mx-auto max-w-7xl px-5 pt-8 pb-6 md:px-8 md:pt-12 md:pb-8">
@@ -100,17 +98,18 @@ export function FAQ() {
                         </svg>
                       </span>
                     </button>
-                    <motion.div
+                    <div
                       id={`faq-a-${i}`}
                       role="region"
                       aria-labelledby={`faq-q-${i}`}
-                      initial={false}
-                      animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
-                      transition={reduce ? { duration: 0 } : { duration: 0.34, ease: [0.22, 0.61, 0.24, 1] }}
-                      className="overflow-hidden"
+                      className={`grid transition-all duration-[340ms] ease-[cubic-bezier(0.22,0.61,0.24,1)] motion-reduce:transition-none ${
+                        isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+                      }`}
                     >
-                      <p className="max-w-2xl pb-6 text-sm leading-relaxed text-muted">{f.a}</p>
-                    </motion.div>
+                      <p className="max-w-2xl overflow-hidden text-sm leading-relaxed text-muted">
+                        <span className="block pb-6">{f.a}</span>
+                      </p>
+                    </div>
                   </div>
                 );
               })}

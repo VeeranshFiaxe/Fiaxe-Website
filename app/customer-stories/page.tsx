@@ -16,8 +16,6 @@ export default function CustomerStoriesPage() {
   return (
     <>
       <PageHero
-        index="00"
-        label="Customer Stories"
         title={
           <>
             Their customers, <span className="underline-bar">their wins.</span>

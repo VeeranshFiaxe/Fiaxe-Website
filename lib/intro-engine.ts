@@ -31,7 +31,7 @@ import {
   MeshPhysicalMaterial,
   MeshStandardMaterial,
   Object3D,
-  PCFSoftShadowMap,
+  PCFShadowMap,
   PerspectiveCamera,
   Plane,
   PlaneGeometry,
@@ -215,7 +215,7 @@ export function createIntro(o: Opts): IntroEngine {
   renderer.toneMapping = ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = PCFSoftShadowMap;
+  renderer.shadowMap.type = PCFShadowMap; // PCFSoft is deprecated and falls back to this anyway
 
   const bg = new Color(o.bg);
   const accent = new Color(o.accent);

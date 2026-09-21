@@ -85,7 +85,8 @@ export function VoiceSamples({ accent }: { accent: string }) {
             className={`h-full flex-1 rounded-full ${playing === null ? "animate-eq" : ""}`}
             style={{
               background: accent,
-              opacity: 0.35 + 0.65 * Math.sin((i / BARS) * Math.PI),
+              // rounded so server and client render the same string (hydration)
+              opacity: +(0.35 + 0.65 * Math.sin((i / BARS) * Math.PI)).toFixed(3),
               transform: playing === null ? undefined : "scaleY(0.08)",
               animationDelay: `${(i % 9) * -0.12}s`,
               animationDuration: `${1 + (i % 4) * 0.2}s`,

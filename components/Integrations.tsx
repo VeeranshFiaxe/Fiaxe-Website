@@ -166,9 +166,6 @@ export function Integrations() {
     <section id="integrations" className="border-y border-line bg-ink-2 py-10 md:py-14">
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <SectionHeading
-          index="04"
-          label="Integrations"
-          rightMeta="Plugs into your stack"
           title={
             <>
               Wired into the tools <span className="underline-bar">you already use.</span>

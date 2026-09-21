@@ -1,16 +1,17 @@
-/* Client logos, shared by the voice AI page and the company pages. */
-export const CLIENTS = [
-  { name: "Mahindra", domain: "mahindra.com", logo: "/logos/mahindra.svg" },
-  { name: "MG", domain: "mgmotor.co.in", logo: "/logos/mg.jpeg" },
-  { name: "Audi", domain: "audi.com", logo: "/logos/audi.svg" },
-  { name: "Hyundai", domain: "hyundai.com", logo: "/logos/hyundai.svg" },
-  { name: "Tata Consumer Products", domain: "tataconsumer.com", logo: "/logos/tataconsumer.png", className: "h-12 md:h-16 w-auto" },
-  { name: "JioHotstar", domain: "hotstar.com", logo: "/logos/jiohotstar.png", className: "no-invert" },
-  { name: "Schbang", domain: "schbang.com", logo: "/logos/schbang.png" },
-  { name: "SoCheers", domain: "socheers.net", logo: "/logos/socheers.png", className: "h-6 md:h-7 w-auto" },
-  { name: "Tonic Worldwide", domain: "tonicworldwide.com", logo: "/logos/tonicworldwide.svg" },
-  { name: "MX Player", domain: "mxplayer.in", logo: "/logos/mxplayer.webp" },
-  { name: "The Belgian Waffle Co", domain: "thebelgianwaffle.co", logo: "/logos/belgianwaffle.svg" },
-  { name: "Aquant", domain: "aquantindia.com", logo: "/logos/aquant.png" },
-  { name: "indē wild", domain: "indewild.com", logo: "/logos/indewild.png", className: "h-6 md:h-8 w-auto" },
+// Logos in the "Trusted by" marquee (public/logos). Raster logos are WebP,
+// 128px tall: 2x the largest size the marquee draws them at.
+export const CLIENTS: { name: string; logo: string; className?: string }[] = [
+  { name: "Mahindra", logo: "/logos/mahindra.svg" },
+  { name: "MG", logo: "/logos/mg.webp" },
+  { name: "Audi", logo: "/logos/audi.svg" },
+  { name: "Hyundai", logo: "/logos/hyundai.svg" },
+  { name: "Tata Consumer Products", logo: "/logos/tataconsumer.webp", className: "h-12 md:h-16" },
+  { name: "JioHotstar", logo: "/logos/jiohotstar.webp", className: "no-invert" },
+  { name: "Schbang", logo: "/logos/schbang.webp" },
+  { name: "SoCheers", logo: "/logos/socheers.webp", className: "h-6 md:h-7" },
+  { name: "Tonic Worldwide", logo: "/logos/tonicworldwide.svg" },
+  { name: "MX Player", logo: "/logos/mxplayer.webp" },
+  { name: "The Belgian Waffle Co", logo: "/logos/belgianwaffle.svg" },
+  { name: "Aquant", logo: "/logos/aquant.webp" },
+  { name: "indē wild", logo: "/logos/indewild.webp", className: "h-6 md:h-8" },
 ];

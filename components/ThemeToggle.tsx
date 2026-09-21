@@ -78,9 +78,8 @@ export function ThemeToggle({
       )
     );
 
-    // Inject a unique @keyframes rule for this specific transition so the
-    // clip-path origin is baked into the CSS (not the Web Animations API
-    // pseudoElement path, which has unreliable coordinate mapping).
+    // A per-toggle @keyframes bakes the clip-path origin into CSS (the Web
+    // Animations pseudoElement path maps coordinates unreliably).
     const uid = `tw-${Date.now()}`;
     const style = document.createElement("style");
     style.textContent = `
@@ -88,57 +87,21 @@ export function ThemeToggle({
         from { clip-path: circle(0px at ${x}px ${y}px); }
         to   { clip-path: circle(${endRadius}px at ${x}px ${y}px); }
       }
-      ::view-transition-old(root) {
-        animation: none;
-        z-index: 1;
-      }
-      ::view-transition-new(root) {
-        animation: ${uid} 650ms cubic-bezier(0.4, 0, 0.2, 1) both;
-        z-index: 9999;
-      }
+      ::view-transition-old(root) { animation: none; z-index: 1; }
+      ::view-transition-new(root) { animation: ${uid} 650ms cubic-bezier(0.4, 0, 0.2, 1) both; z-index: 9999; }
     `;
     document.head.appendChild(style);
 
-    // Pause all running CSS animations before the VT old-state snapshot.
-    // Pages with marquee / waveform animations create many GPU compositor
-    // layers; the snapshot readback of those layers causes the stutter on
-    // the home and agents pages. Pausing them collapses the layers so the
-    // snapshot is captured instantly. The attribute is removed inside the
-    // callback so the new-state renders with animations already running.
-    const ROOT = document.documentElement;
-    ROOT.setAttribute("data-vt-snap", "");
-
-    // The View Transitions API captures real screenshots of old & new state
-    // so the actual page content, not a solid colour, is revealed.
-    const cleanup = () => {
-      style.remove();
-      ROOT.removeAttribute("data-vt-snap");
-    };
-
-    // One rAF gives the browser a full frame to process the data-vt-snap
-    // style changes before VT takes its old-state snapshot. Framer Motion
-    // (used by Agents.tsx) sets will-change:transform,opacity as inline
-    // styles on every animated element, promoting each to its own GPU layer.
-    // The CSS [data-vt-snap] will-change:auto rule overrides those inline
-    // styles (!important wins over inline in the cascade), but the compositor
-    // needs one paint tick to actually de-promote the layers. Without this
-    // rAF, the snapshot fires before de-promotion completes → GPU readback
-    // of dozens of layers → jank on the agents page.
+    // data-vt-snap pauses animations and transitions (globals.css) so the
+    // old-state snapshot is cheap and every colour snaps at once in the new
+    // one. One rAF lets that style apply before the snapshot is taken.
+    const root = document.documentElement;
+    root.setAttribute("data-vt-snap", "");
+    const cleanup = () => (style.remove(), root.removeAttribute("data-vt-snap"));
     requestAnimationFrame(() => {
       document
-        .startViewTransition(() => {
-          // Apply theme BEFORE removing data-vt-snap so CSS transitions are
-          // still disabled when the colour variables change. Every element
-          // snaps to its final colour instantly, giving the VT new-state
-          // snapshot a fully-themed frame. If we re-enable transitions first,
-          // elements with transition-colors animate independently mid-wipe,
-          // making the background appear to change before the containers.
-          applyTheme(next);
-          ROOT.removeAttribute("data-vt-snap"); // re-enable transitions after colours are set
-        })
-        .finished
-        .then(cleanup)
-        .catch(cleanup);
+        .startViewTransition(() => (applyTheme(next), root.removeAttribute("data-vt-snap")))
+        .finished.then(cleanup, cleanup);
     });
   }
 

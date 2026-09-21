@@ -1,8 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { motion, useMotionTemplate, useMotionValue } from "motion/react";
+import { useRef } from "react";
 import { Reveal, Waveform } from "./primitives";
+import { useCarousel } from "./client";
 
 type Step = { label: string; title: string; desc: string; tag?: string; timeline?: string };
 
@@ -51,14 +51,12 @@ const STEPS: Step[] = [
    under the existing hover-lift. Pure decoration; invisible without hover,
    so touch devices simply never see it. */
 function StepCard({ step, index }: { step: Step; index: number }) {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const glow = useMotionTemplate`radial-gradient(280px circle at ${x}px ${y}px, color-mix(in oklab, var(--blue) 14%, transparent), transparent 72%)`;
-
+  // Writes the cursor position to CSS variables: no React re-render per move.
   function onMove(e: React.MouseEvent<HTMLElement>) {
-    const r = e.currentTarget.getBoundingClientRect();
-    x.set(e.clientX - r.left);
-    y.set(e.clientY - r.top);
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    el.style.setProperty("--mx", `${e.clientX - r.left}px`);
+    el.style.setProperty("--my", `${e.clientY - r.top}px`);
   }
 
   return (
@@ -67,9 +65,9 @@ function StepCard({ step, index }: { step: Step; index: number }) {
       className="relative flex flex-1 flex-col overflow-hidden rounded-3xl border border-line bg-ink p-6 shadow-sm transition-all duration-300 group-hover:-translate-y-1 group-hover:border-blue/40 group-hover:shadow-md"
     >
       {/* cursor-tracking spotlight, faded in only while hovering */}
-      <motion.span
+      <span
         aria-hidden
-        style={{ background: glow }}
+        style={{ background: "radial-gradient(280px circle at var(--mx) var(--my), color-mix(in oklab, var(--blue) 14%, transparent), transparent 72%)" }}
         className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
       />
 
@@ -107,38 +105,8 @@ function StepCard({ step, index }: { step: Step; index: number }) {
 
 export function Process() {
   const trackRef = useRef<HTMLOListElement>(null);
-  const [isAutoPaused, setIsAutoPaused] = useState(false);
-  const autoPauseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { pause } = useCarousel(trackRef, 20, 1024);
 
-  const scrollByCard = useCallback((dir: 1 | -1) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const first = track.firstElementChild as HTMLElement | null;
-    const step = first ? first.offsetWidth + 20 : track.clientWidth * 0.8;
-    track.scrollBy({ left: dir * step, behavior: "smooth" });
-  }, []);
-
-  const pauseAuto = useCallback(() => {
-    setIsAutoPaused(true);
-    if (autoPauseTimer.current) clearTimeout(autoPauseTimer.current);
-    autoPauseTimer.current = setTimeout(() => setIsAutoPaused(false), 4000);
-  }, []);
-
-  useEffect(() => {
-    if (isAutoPaused) return;
-    const interval = setInterval(() => {
-      const track = trackRef.current;
-      if (!track) return;
-      if (window.innerWidth >= 1024) return;
-      const max = track.scrollWidth - track.clientWidth;
-      if (track.scrollLeft >= max - 4) {
-        track.scrollTo({ left: 0, behavior: "smooth" });
-      } else {
-        scrollByCard(1);
-      }
-    }, 3500);
-    return () => clearInterval(interval);
-  }, [isAutoPaused, scrollByCard]);
   return (
     <section
       id="how-it-works"
@@ -177,7 +145,7 @@ export function Process() {
           back into a grid. */}
       <ol
         ref={trackRef}
-        onPointerDown={pauseAuto}
+        onPointerDown={() => pause()}
         className="no-scrollbar -mx-5 flex snap-x snap-mandatory gap-5 overflow-x-auto px-5 pt-2 pb-3 max-lg:mt-0 md:-mx-8 md:px-8 lg:mx-0 lg:mt-14 lg:grid lg:grid-cols-3 lg:overflow-visible lg:px-0"
       >
         <li className="shrink-0 w-[10%] lg:hidden" aria-hidden="true" />

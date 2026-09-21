@@ -1,6 +1,5 @@
-"use client";
-
-import { CountUp, Reveal, SectionHeading } from "./primitives";
+import { Reveal, SectionHeading } from "./primitives";
+import { CountUp } from "./client";
 
 /* Outcome proof, moved here from the former homepage Results section so all
    customer proof lives on one page. (Generic market-size stats were dropped;
@@ -56,8 +55,6 @@ export function CustomerOutcomes() {
   return (
     <section className="mx-auto max-w-7xl px-5 pt-10 pb-8 md:px-8 md:pt-14 md:pb-10">
       <SectionHeading
-        label="The Difference"
-        rightMeta="Real outcomes"
         title={
           <>
             What changes once <span className="underline-bar">Fiaxe answers.</span>

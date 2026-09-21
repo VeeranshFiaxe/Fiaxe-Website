@@ -34,9 +34,6 @@ export function UseCases() {
   return (
     <section id="use-cases" className="mx-auto max-w-7xl px-5 pt-8 pb-10 md:px-8 md:pt-10 md:pb-14">
       <SectionHeading
-        index="03"
-        label="Use Cases"
-        rightMeta="Tuned for your industry"
         title={
           <>
             One platform. <span className="underline-bar">Every industry.</span>

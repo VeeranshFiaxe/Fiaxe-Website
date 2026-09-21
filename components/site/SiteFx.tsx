@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
 
 /* One small engine for every lightweight effect on the site, driven by data
    attributes so server components can opt in without shipping any JS:
 
-     data-reveal       fades/slides in once when scrolled into view
-                       (--d on the element staggers it)
+     data-reveal       fades/slides in once when scrolled into view (sets data-in)
+                       (--d steps of 80ms, or --delay, stagger it)
      data-anim         CSS animations inside pause while off screen
      .tilt             card leans toward the cursor with a spotlight
      data-magnetic     element drifts toward the cursor
@@ -15,16 +14,14 @@ import { usePathname } from "next/navigation";
    One IntersectionObserver per kind and one pointer listener for the page,
    rather than one per element. */
 export function SiteFx() {
-  const pathname = usePathname();
-
   useEffect(() => {
     const reveal = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
-          if (e.isIntersecting) {
-            e.target.classList.add("in");
-            reveal.unobserve(e.target);
-          }
+          if (!e.isIntersecting) continue;
+          // an attribute React doesn't own, so re-renders never wipe it
+          e.target.setAttribute("data-in", "");
+          reveal.unobserve(e.target);
         }
       },
       { rootMargin: "0px 0px -8% 0px" },
@@ -33,18 +30,25 @@ export function SiteFx() {
       for (const e of entries) e.target.toggleAttribute("data-offscreen", !e.isIntersecting);
     });
 
-    // wait a frame so the new route's DOM is in place
-    const raf = requestAnimationFrame(() => {
-      document.querySelectorAll("[data-reveal]:not(.in)").forEach((el) => reveal.observe(el));
+    // Rescan whenever nodes are added (route changes, filters, late content),
+    // at most once per frame. Observing an element twice is a no-op.
+    let raf = 0;
+    const scan = () => {
+      raf = 0;
+      document.querySelectorAll("[data-reveal]:not([data-in])").forEach((el) => reveal.observe(el));
       document.querySelectorAll("[data-anim]").forEach((el) => anim.observe(el));
-    });
+    };
+    scan();
+    const mo = new MutationObserver(() => (raf ||= requestAnimationFrame(scan)));
+    mo.observe(document.body, { childList: true, subtree: true });
 
     return () => {
       cancelAnimationFrame(raf);
+      mo.disconnect();
       reveal.disconnect();
       anim.disconnect();
     };
-  }, [pathname]);
+  }, []);
 
   useEffect(() => {
     if (!window.matchMedia("(hover: hover)").matches) return;

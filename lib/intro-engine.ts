@@ -862,6 +862,7 @@ export function createIntro(o: Opts): IntroEngine {
       envTex.dispose();
       pmrem.dispose();
       renderer.dispose();
+      renderer.forceContextLoss(); // free the WebGL context now, not at GC; browsers cap them
     },
   };
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { motion } from "motion/react";
 import Link from "next/link";
 import { Reveal } from "./primitives";
 
@@ -48,7 +47,6 @@ const GAP = 240;
 const LOCK_MS = 320;
 const SWIPE_THRESHOLD = 32;
 const TOTAL = TESTIMONIALS.length;
-const TRANSITION = { duration: 0.26, ease: [0.22, 0.61, 0.24, 1] as const };
 
 function TestimonialCard({ t }: { t: Testimonial }) {
   return (
@@ -164,23 +162,18 @@ export function Testimonials() {
             const t = TESTIMONIALS[((k % TOTAL) + TOTAL) % TOTAL];
 
             return (
-              <motion.div
+              <div
                 key={k}
-                className="absolute inset-x-0 mx-auto max-w-xl px-1"
-                initial={false}
-                animate={{
-                  y: baseY + offset * GAP,
-                  opacity: isActive ? 1 : isNear ? 0.55 : 0,
-                  scale: isActive ? 1 : isNear ? 0.9 : 0.8,
-                }}
-                transition={TRANSITION}
+                className="absolute inset-x-0 mx-auto max-w-xl px-1 transition-[transform,opacity] duration-[260ms] ease-[cubic-bezier(0.22,0.61,0.24,1)]"
                 style={{
+                  transform: `translateY(${baseY + offset * GAP}px) scale(${isActive ? 1 : isNear ? 0.9 : 0.8})`,
+                  opacity: isActive ? 1 : isNear ? 0.55 : 0,
                   zIndex: isActive ? 30 : isNear ? 20 : 0,
                   pointerEvents: isActive ? "auto" : "none",
                 }}
               >
                 <TestimonialCard t={t} />
-              </motion.div>
+              </div>
             );
           })}
         </div>

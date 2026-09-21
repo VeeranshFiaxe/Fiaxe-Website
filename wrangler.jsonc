@@ -38,7 +38,8 @@
     // hashed JS/CSS bundle that is the bulk of the request volume. The cost is
     // that a hotlinked /_next/* URL on www skips the redirect and serves the
     // asset, which is harmless -- no HTML, nothing for a crawler to index.
-    "run_worker_first": ["/*", "!/_next/*"]
+    // The static media folders skip the Worker for the same reason.
+    "run_worker_first": ["/*", "!/_next/*", "!/recordings/*", "!/logos/*", "!/hero/*"]
   },
 
   // worker/n8n-forwarder.ts, deployed from wrangler.n8n-forwarder.jsonc. The

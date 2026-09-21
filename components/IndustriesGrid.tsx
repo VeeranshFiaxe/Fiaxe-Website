@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { Reveal, Kicker } from "./primitives";
+import { Reveal } from "./primitives";
 
 type Industry = { name: string; use: string; tags: string[]; icon: ReactNode };
 
@@ -108,9 +108,6 @@ export function IndustriesGrid() {
         {/* sticky heading (right on desktop) */}
         <div className="order-1 lg:order-2 lg:col-span-5">
           <div className="lg:sticky lg:top-28">
-            <Reveal>
-              <Kicker label="Industries" />
-            </Reveal>
             <Reveal delay={0.06}>
               <h2 className="mt-6 font-display text-4xl font-medium tracking-tight text-balance md:text-5xl">
                 Built for businesses{" "}

@@ -320,6 +320,7 @@ export function createEngine(
       geo.dispose();
       mat.dispose();
       renderer.dispose();
+      renderer.forceContextLoss(); // free the WebGL context now, not at GC; browsers cap them
     },
   };
   return engine;

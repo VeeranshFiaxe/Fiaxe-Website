@@ -1,75 +1,31 @@
-"use client";
+import type { CSSProperties, ReactNode } from "react";
 
-import { motion, useInView, useMotionValue, useSpring } from "motion/react";
-import { useEffect, useRef, type ReactNode } from "react";
-
+// Server-rendered, zero-JS primitives. Animation is plain CSS (see globals.css):
+// `data-reveal` elements fade in when <SiteFx> sees them scroll into
+// view; `onLoad` elements run a CSS keyframe immediately, which keeps
+// above-the-fold content (and LCP) from waiting on hydration.
 export function Reveal({
   children,
   delay = 0,
   y = 14,
-  className,
+  x = 0,
+  onLoad = false,
+  className = "",
   style,
 }: {
   children: ReactNode;
   delay?: number;
   y?: number;
+  x?: number;
+  onLoad?: boolean;
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }) {
-  return (
-    <motion.div
-      className={className}
-      style={style}
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.5, delay, ease: [0.22, 0.61, 0.24, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
-export function CountUp({
-  value,
-  suffix = "",
-  prefix = "",
-  decimals = 0,
-  className,
-}: {
-  value: number;
-  suffix?: string;
-  prefix?: string;
-  decimals?: number;
-  className?: string;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-40px" });
-  const mv = useMotionValue(0);
-  const spring = useSpring(mv, { duration: 1600, bounce: 0 });
-
-  useEffect(() => {
-    if (inView) mv.set(value);
-  }, [inView, value, mv]);
-
-  useEffect(() => {
-    return spring.on("change", (v) => {
-      if (ref.current) {
-        ref.current.textContent =
-          prefix +
-          v.toLocaleString("en-IN", {
-            minimumFractionDigits: decimals,
-            maximumFractionDigits: decimals,
-          }) +
-          suffix;
-      }
-    });
-  }, [spring, prefix, suffix, decimals]);
-
-  return (
-    <span ref={ref} className={className}>
-      {prefix}0{suffix}
-    </span>
+  const vars = { "--delay": `${delay}s`, "--y": `${y}px`, "--x": `${x}px`, ...style } as CSSProperties;
+  return onLoad ? (
+    <div className={`fade-up ${className}`} style={vars}>{children}</div>
+  ) : (
+    <div data-reveal className={className} style={vars}>{children}</div>
   );
 }
 
@@ -77,38 +33,27 @@ export function CountUp({
 export function SectionHeading({
   title,
   copy,
-  as = "h2",
+  as: Heading = "h2",
 }: {
-  index?: string;
-  label?: string;
   title: ReactNode;
   copy?: string;
-  rightMeta?: string;
-  align?: "left" | "center";
   as?: "h1" | "h2";
 }) {
-  const Component = as;
+  const onLoad = Heading === "h1";
   return (
     <div className="mb-12 md:mb-16">
-      <Reveal>
-        <Component className="max-w-3xl font-display text-4xl font-medium tracking-tight text-balance md:text-5xl lg:text-[3.3rem] lg:leading-[1.07]">
+      <Reveal onLoad={onLoad}>
+        <Heading className="max-w-3xl font-display text-4xl font-medium tracking-tight text-balance md:text-5xl lg:text-[3.3rem] lg:leading-[1.07]">
           {title}
-        </Component>
+        </Heading>
       </Reveal>
       {copy && (
-        <Reveal delay={0.14}>
+        <Reveal onLoad={onLoad} delay={0.14}>
           <p className="mt-5 max-w-2xl text-lg leading-relaxed text-muted text-pretty">{copy}</p>
         </Reveal>
       )}
     </div>
   );
-}
-
-/* Eyebrow pill removed by request, kept as a no-op so existing call sites
-   continue to type-check without rendering anything. */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function Kicker(props: { label: string; className?: string }) {
-  return null;
 }
 
 /* Animated equalizer bars, the voice motif */
@@ -123,15 +68,11 @@ export function Waveform({
 }) {
   return (
     <span className={`inline-flex items-center gap-[3px] h-4 ${className}`} aria-hidden>
-      {Array.from({ length: bars }).map((_, i) => (
+      {Array.from({ length: bars }, (_, i) => (
         <span
           key={i}
-          className={`w-[3px] rounded-full animate-eq ${barClassName}`}
-          style={{
-            height: "100%",
-            animationDelay: `${i * 0.13}s`,
-            animationDuration: `${0.9 + (i % 3) * 0.25}s`,
-          }}
+          className={`h-full w-[3px] rounded-full animate-eq ${barClassName}`}
+          style={{ animationDelay: `${i * 0.13}s`, animationDuration: `${0.9 + (i % 3) * 0.25}s` }}
         />
       ))}
     </span>

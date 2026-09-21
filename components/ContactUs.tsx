@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { utmParams } from "@/lib/utm";
 import { Reveal } from "./primitives";
 
 const fieldCls =
@@ -24,37 +25,23 @@ const TIME_SLOTS = [
 
 type Status = "idle" | "sending" | "success" | "error";
 
+// Bookings start tomorrow. Set on focus: the page is prerendered, so the
+// date can't be baked into the HTML.
+function setMinTomorrow(e: React.FocusEvent<HTMLInputElement>) {
+  const d = new Date(Date.now() + 86_400_000);
+  e.currentTarget.min = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 export function ContactUs() {
   const [status, setStatus] = useState<Status>("idle");
 
-  const [minDate, setMinDate] = useState("");
-  const [utm, setUtm] = useState<Record<string, string>>({});
-  
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setUtm({
-      utm_source: params.get("utm_source") || "",
-      utm_medium: params.get("utm_medium") || "",
-      utm_campaign: params.get("utm_campaign") || "",
-      utm_term: params.get("utm_term") || "",
-      utm_content: params.get("utm_content") || "",
-    });
-    const tmrw = new Date();
-    tmrw.setDate(tmrw.getDate() + 1);
-    const iso = `${tmrw.getFullYear()}-${String(tmrw.getMonth() + 1).padStart(2, "0")}-${String(tmrw.getDate()).padStart(2, "0")}`;
-    setMinDate(iso);
-  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const form = e.currentTarget;
     const payload = Object.fromEntries(new FormData(form).entries());
     payload.page = "contactus";
-    payload.utm_source = utm.utm_source;
-    payload.utm_medium = utm.utm_medium;
-    payload.utm_campaign = utm.utm_campaign;
-    payload.utm_term = utm.utm_term;
-    payload.utm_content = utm.utm_content;
+    Object.assign(payload, utmParams());
 
     setStatus("sending");
     try {
@@ -75,7 +62,7 @@ export function ContactUs() {
   return (
     <section className="mx-auto max-w-7xl px-5 pt-20 pb-12 md:px-8 md:pt-28 md:pb-16">
       <div className="grid gap-5 lg:grid-cols-2">
-        <Reveal className="rounded-2xl border border-line bg-ink shadow-sm">
+        <Reveal onLoad className="rounded-2xl border border-line bg-ink shadow-sm">
           <div className="flex h-full flex-col p-6 md:p-8">
             <p className="mono-label">Get in touch & book demo</p>
             <h1 className="mt-6 font-display text-3xl font-medium tracking-tight text-balance md:text-4xl">
@@ -99,7 +86,7 @@ export function ContactUs() {
           </div>
         </Reveal>
 
-        <Reveal className="rounded-2xl border border-line bg-ink shadow-sm" delay={0.08}>
+        <Reveal onLoad className="rounded-2xl border border-line bg-ink shadow-sm" delay={0.08}>
           <form onSubmit={handleSubmit} className="flex h-full flex-col gap-4 p-6 md:p-8">
             {/* Honeypot field to catch bots */}
             <div style={{ display: "none" }} aria-hidden="true">
@@ -124,7 +111,7 @@ export function ContactUs() {
               </label>
               <label className="flex flex-col gap-2">
                 <span className={labelCls}>Preferred date</span>
-                <input name="date" type="date" min={minDate} className={fieldCls} required />
+                <input name="date" type="date" onFocus={setMinTomorrow} className={fieldCls} required />
               </label>
               <label className="flex flex-col gap-2">
                 <span className={labelCls}>Preferred time</span>

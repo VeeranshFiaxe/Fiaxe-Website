@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CountUp, Reveal } from "./primitives";
+import { Reveal } from "./primitives";
+import { CountUp } from "./client";
 
 /* ── Data ──────────────────────────────────────────────────────────────
    Fiaxe-branded customer stories. Companies are illustrative (consistent

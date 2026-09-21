@@ -3,9 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 
 const SAMPLES = [
-  { label: "Lead qualification", src: "/recordings/lead-qualification.wav" },
-  { label: "Customer support", src: "/recordings/customer-support.wav" },
-  { label: "Cart recovery", src: "/recordings/cart-recovery.wav" },
+  { label: "Lead qualification", src: "/recordings/lead-qualification.mp3" },
+  { label: "Customer support", src: "/recordings/customer-support.mp3" },
+  { label: "Cart recovery", src: "/recordings/cart-recovery.mp3" },
 ];
 
 const BARS = 36;
@@ -18,6 +18,17 @@ export function VoiceSamples({ accent }: { accent: string }) {
   const bars = useRef<HTMLDivElement>(null);
   const graph = useRef<{ ctx: AudioContext; an: AnalyserNode } | null>(null);
   const [playing, setPlaying] = useState<number | null>(null);
+
+  // Leaving the page must stop playback and free the AudioContext; browsers
+  // cap live contexts, so leaked ones eventually break audio site-wide.
+  useEffect(() => {
+    const el = audio.current;
+    return () => {
+      el?.pause();
+      graph.current?.ctx.close();
+      graph.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     if (playing === null) return;

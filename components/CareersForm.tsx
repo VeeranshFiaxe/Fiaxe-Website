@@ -156,7 +156,7 @@ export function CareersForm() {
         <button
           type="submit"
           disabled={status === "sending"}
-          className="mt-1 rounded-xl bg-blue px-6 py-3.5 font-mono text-xs font-medium tracking-[0.14em] text-white uppercase transition-colors hover:bg-blue-bright disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-1 rounded-xl bg-cream px-6 py-3.5 font-mono text-xs font-medium tracking-[0.14em] text-canvas uppercase transition-colors hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {status === "sending" ? "Submitting…" : "Submit application →"}
         </button>

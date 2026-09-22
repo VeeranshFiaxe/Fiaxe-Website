@@ -15,7 +15,7 @@ export function AgentsHero() {
       <div className="mx-auto max-w-7xl px-5 md:px-8">
         <Reveal onLoad>
           <h1 className="max-w-4xl font-display text-5xl font-medium leading-[1.05] tracking-tight text-balance md:text-[4rem]">
-            Agents that do more <span className="underline-bar">than just talk.</span>
+            Agents that do more <span className="text-muted">than just talk.</span>
           </h1>
         </Reveal>
         <Reveal onLoad delay={0.14}>

@@ -50,7 +50,7 @@ const SOCIALS = [
 
 export function Footer() {
   return (
-    <footer className="border-t border-line">
+    <footer className="overflow-hidden border-t border-line">
       <div className="mx-auto max-w-7xl px-5 py-10 md:px-8 md:py-12">
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 md:gap-12 lg:grid-cols-[1.4fr_repeat(4,1fr)]">
           <div className="col-span-2 sm:col-span-3 lg:col-span-1">
@@ -67,7 +67,7 @@ export function Footer() {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="grid size-9 place-items-center border border-line font-mono text-xs text-muted transition-colors hover:border-cream hover:text-cream"
+                  className="grid size-9 place-items-center rounded-full border border-line font-mono text-xs text-muted transition-colors hover:border-cream hover:text-cream"
                 >
                   {s.label}
                 </a>
@@ -77,7 +77,7 @@ export function Footer() {
 
           {COLUMNS.map((col) => (
             <div key={col.title}>
-              <p className="mono-label mb-5">{col.title}</p>
+              <p className="mb-5 text-sm font-medium">{col.title}</p>
               <ul className="space-y-3">
                 {col.links.map((l) => (
                   <li key={l.label}>
@@ -89,7 +89,15 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-line pt-8 md:flex-row">
+        {/* oversized wordmark, cropped by the page edge */}
+        <p
+          aria-hidden
+          className="display mt-16 -mb-[0.2em] text-center text-[26vw] leading-none text-cream/[0.06] select-none lg:text-[19rem]"
+        >
+          Fiaxe
+        </p>
+
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-line pt-8 md:flex-row">
           <p className="font-mono text-[11px] tracking-wider text-faint uppercase">
             © {new Date().getFullYear()} Fiaxe
           </p>

@@ -180,7 +180,7 @@ export function CrmShowcase() {
         <SectionHeading
           title={
             <>
-              The only voice AI with a <span className="underline-bar">CRM built in.</span>
+              The only voice AI with a <span className="text-muted">CRM built in.</span>
             </>
           }
           copy="Other platforms hand you transcripts and wish you luck. Fiaxe ships with a full CRM, pipeline, automation, and call intelligence in one place."
@@ -204,7 +204,7 @@ export function CrmShowcase() {
             <Reveal delay={0.25}>
               <a
                 href="/contact-us"
-                className="mt-8 inline-block rounded-xl bg-cream px-6 py-3.5 font-mono text-xs font-medium tracking-[0.14em] text-canvas uppercase transition-colors hover:bg-blue hover:text-white"
+                className="mt-8 inline-block rounded-xl bg-cream px-6 py-3.5 font-mono text-xs font-medium tracking-[0.14em] text-canvas uppercase transition-colors hover:bg-cream hover:text-canvas"
               >
                 Explore Fiaxe CRM →
               </a>

@@ -305,7 +305,7 @@ export function CustomerStories() {
                     aria-pressed={active}
                     className={`rounded-full px-3.5 py-1.5 font-mono text-[10px] tracking-[0.1em] uppercase transition-colors ${
                       active
-                        ? "bg-blue text-white"
+                        ? "bg-cream text-canvas"
                         : "border border-line text-muted hover:border-line-bright hover:text-cream"
                     }`}
                   >
@@ -350,7 +350,7 @@ export function CustomerStories() {
             <Reveal key={sp.company} delay={(i % 3) * 0.06}>
               <figure className="flex h-full flex-col rounded-2xl border border-line bg-ink-2 p-7">
                 <div className="flex items-center justify-between">
-                  <span className="grid size-11 place-items-center rounded-full bg-blue font-mono text-xs font-medium text-white">
+                  <span className="grid size-11 place-items-center rounded-full bg-cream font-mono text-xs font-medium text-canvas">
                     {sp.initials}
                   </span>
                   <span

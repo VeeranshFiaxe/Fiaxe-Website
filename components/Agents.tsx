@@ -52,7 +52,7 @@ function AgentCard({
           onClick={toggle}
           aria-label={label}
           aria-pressed={playing}
-          className="grid size-9 shrink-0 place-items-center rounded-xl bg-blue text-white transition-colors hover:bg-blue-bright"
+          className="grid size-9 shrink-0 place-items-center rounded-xl bg-cream text-canvas transition-colors hover:opacity-85"
         >
           <PlayIcon playing={playing} />
         </button>

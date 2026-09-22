@@ -1,0 +1,7 @@
+# Services and products live on the home page now. Detail pages keep their URLs.
+/solutions / 301
+/solutions/ / 301
+/services /#solutions 301
+/services/ /#solutions 301
+/products /#products 301
+/products/ /#products 301

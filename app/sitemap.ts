@@ -9,9 +9,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Key static routes
   const routes = [
     "",
-    "/services",
     ...SERVICES.map(serviceHref),
-    "/products",
     ...PRODUCTS.map(productHref),
     "/agents",
     "/customer-stories",

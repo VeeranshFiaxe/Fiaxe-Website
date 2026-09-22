@@ -19,7 +19,7 @@
 
   --font-display: var(--font-inter), system-ui, sans-serif;
   --font-body: var(--font-inter), system-ui, sans-serif;
-  --font-mono: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 @theme {
@@ -29,42 +29,44 @@
 }
 
 /* ── Light theme (default) ─────────────────────────────────────────── */
-/* "canvas" is the page background; "ink" is cards/surfaces, so cards lift
-   off the page with a soft border + shadow (modern SaaS depth). The neutral
-   base is a warm cream, with a confident blue accent for contrast. */
+/* Quiet, near-monochrome palette: warm off-white page, white cards, soft
+   grey rules and near-black type. Colour comes from each offering's accent
+   (lib/catalog.ts) and the soft gradient orbs, never from the chrome. */
 :root,
 [data-theme="light"] {
-  --canvas: #f7f5f2;
+  --canvas: #fbfaf8;
   --ink: #ffffff;
-  --ink-2: #faf8f5;
+  --ink-2: #f7f6f3;
   --surface: #ffffff;
-  --surface-2: #f3f0eb;
-  --line: #e9e4dc;
-  --line-bright: #d8d2c8;
-  --blue: #0c9b6a;
-  --blue-bright: #12b87f;
-  --blue-deep: #0a7a52;
-  --cream: #1b1714;
-  --muted: #6a635c;
-  --faint: #a69e94;
+  --surface-2: #f1efeb;
+  --line: #e7e4df;
+  --line-bright: #d3cfc8;
+  --blue: #0b8a5b;
+  --blue-bright: #0fa56d;
+  --blue-deep: #08704a;
+  --cream: #0d0d0c;
+  --muted: #5f5c57;
+  --faint: #9b978f;
+  --shadow: 0 1px 2px rgb(20 16 10 / 0.04), 0 8px 24px -12px rgb(20 16 10 / 0.08);
   color-scheme: light;
 }
 
 /* ── Dark theme ────────────────────────────────────────────────────── */
 [data-theme="dark"] {
-  --canvas: #0b0a0c;
-  --ink: #151417;
-  --ink-2: #1c1b1f;
-  --surface: #151417;
-  --surface-2: #211f24;
-  --line: #2c2a30;
-  --line-bright: #403d45;
-  --blue: #18e299;
-  --blue-bright: #4fecb3;
-  --blue-deep: #15c489;
-  --cream: #f4f1ec;
-  --muted: #a39d96;
-  --faint: #6f6960;
+  --canvas: #0a0a0a;
+  --ink: #121212;
+  --ink-2: #171717;
+  --surface: #121212;
+  --surface-2: #1d1d1c;
+  --line: #262625;
+  --line-bright: #3a3937;
+  --blue: #34d399;
+  --blue-bright: #6ee7b7;
+  --blue-deep: #10b981;
+  --cream: #f5f4f2;
+  --muted: #a3a09a;
+  --faint: #6e6b66;
+  --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
   color-scheme: dark;
 }
 
@@ -292,7 +294,7 @@ body {
 .mono-label {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--faint);
 }
@@ -321,13 +323,11 @@ body {
   animation-play-state: paused !important;
 }
 
-/* tilt + spotlight cards. --rx/--ry/--mx/--my are set by SiteFx */
+/* spotlight cards: a soft accent glow follows the cursor (--mx/--my from
+   SiteFx) and the card lifts a touch. No 3D lean, to keep the page calm. */
 .tilt {
-  --accent: var(--blue);
   position: relative;
-  transform: perspective(1000px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
-  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.3s;
-  transform-style: preserve-3d;
+  transition: translate 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.3s, box-shadow 0.4s;
 }
 .tilt::before {
   content: "";
@@ -338,17 +338,17 @@ body {
   opacity: 0;
   transition: opacity 0.3s;
   background: radial-gradient(
-    420px circle at var(--mx, 50%) var(--my, 50%),
-    color-mix(in srgb, var(--accent) 16%, transparent),
+    380px circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--accent, var(--blue)) 10%, transparent),
     transparent 60%
   );
 }
 .tilt:hover::before { opacity: 1; }
-.tilt:hover { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+.tilt:hover { border-color: var(--line-bright); box-shadow: var(--shadow); }
 
 /* hero backdrop: a faint grid that fades out toward the edges */
 .grid-bg {
-  --grid: color-mix(in srgb, var(--line) 65%, transparent);
+  --grid: color-mix(in srgb, var(--line) 45%, transparent);
   background-image:
     linear-gradient(var(--grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid) 1px, transparent 1px);
@@ -437,6 +437,12 @@ body {
 html.no-intro #fx-intro {
   display: none;
 }
+/* the intro's puzzle pieces copy the page in its settled state */
+.intro-clone .fade-up,
+.intro-clone .rise-w > span,
+.intro-clone .nav-enter {
+  animation: none !important;
+}
 
 /* CRM mock score bars: fill once the parent Reveal is in view */
 .score-bar {
@@ -445,4 +451,141 @@ html.no-intro #fx-intro {
 }
 [data-in] .score-bar {
   width: var(--w);
+}
+
+
+/* ══ Design language (ElevenLabs-calm) ═════════════════════════════════
+   Light display type, pill buttons, soft gradient orbs and hairline rules.
+   Every page draws from these so the site reads as one voice. */
+
+@layer components {
+.display {
+  font-family: var(--font-display);
+  font-weight: 300;
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 999px;
+  padding: 0.8rem 1.35rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
+}
+.btn-primary { background: var(--cream); color: var(--canvas); }
+.btn-primary:hover { opacity: 0.86; }
+.btn-ghost { background: var(--ink); color: var(--cream); border: 1px solid var(--line); }
+.btn-ghost:hover { border-color: var(--line-bright); background: var(--surface-2); }
+.btn-sm { padding: 0.55rem 1rem; font-size: 0.8125rem; }
+
+/* Gradient orb: the site's signature mark. --a/--b/--c tint it; it slowly
+   turns. Pure CSS, so it costs no JS and pauses off screen via data-anim. */
+.orb {
+  --a: var(--accent, var(--blue));
+  --b: color-mix(in srgb, var(--a) 55%, #ffffff);
+  --c: color-mix(in srgb, var(--a) 70%, #1a1030);
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 30% 25%, color-mix(in srgb, var(--b) 90%, white) 0%, transparent 45%),
+    radial-gradient(circle at 75% 70%, var(--c) 0%, transparent 55%),
+    conic-gradient(from var(--orb-turn, 0deg), var(--a), var(--b), var(--c), var(--a));
+  box-shadow: inset 0 -12px 40px rgb(0 0 0 / 0.18), inset 0 10px 30px rgb(255 255 255 / 0.25);
+  animation: orb-turn 14s linear infinite;
+  isolation: isolate;
+}
+.orb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(circle at 50% 50%, transparent 55%, rgb(0 0 0 / 0.12));
+  mix-blend-mode: multiply;
+}
+.orb-grain::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0.22;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index: 1;
+}
+}
+
+/* multi-hue orbs where relative colours are supported (ElevenLabs-like) */
+@supports (color: oklch(from red l c h)) {
+  .orb {
+    --b: oklch(from var(--a) calc(l + 0.14) calc(c * 0.9) calc(h + 55));
+    --c: oklch(from var(--a) calc(l - 0.12) c calc(h - 45));
+  }
+}
+@property --orb-turn { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes orb-turn { to { --orb-turn: 360deg; } }
+.orb-breathe { animation: orb-turn 14s linear infinite, orb-breathe 5s ease-in-out infinite; }
+@keyframes orb-breathe { 50% { scale: 1.035; } }
+
+/* Headline that rises in word by word (Accenture-style), from <Headline>.
+   Each word sits in a clipping box; --i staggers it. Plays on load. */
+.rise-w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; margin-bottom: -0.08em; }
+.rise-w > span { display: inline-block; animation: rise 0.9s cubic-bezier(0.2, 0.75, 0.15, 1) both; animation-delay: calc(var(--i) * 55ms + var(--delay, 0s)); }
+@keyframes rise { from { transform: translateY(105%); } }
+/* same, but waits for the scroll reveal */
+.fx [data-reveal] .rise-w > span { animation: none; transform: translateY(105%); transition: transform 0.9s cubic-bezier(0.2, 0.75, 0.15, 1) calc(var(--i) * 55ms); }
+.fx [data-reveal][data-in] .rise-w > span { transform: none; }
+
+/* thin hairline grid, like a spec sheet: children get rules between them */
+.rules > * { border-color: var(--line); }
+
+/* dotted canvas (n8n-style editor background) */
+.dot-grid {
+  background-image: radial-gradient(color-mix(in srgb, var(--cream) 16%, transparent) 1px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+
+/* sticky in-page subnav (Accenture) */
+.subnav a[aria-current="true"] { color: var(--cream); }
+
+/* ── Automation canvas (components/site/WorkflowCanvas.tsx) ── */
+.wf-edge { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); transition: stroke-dashoffset 0.7s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s; }
+.wf-edge[data-on] { stroke-dashoffset: 0; }
+.wf-node { opacity: 0; scale: 0.8; transition: opacity 0.4s, scale 0.5s cubic-bezier(0.3, 1.5, 0.5, 1); }
+.wf-node[data-on] { opacity: 1; scale: 1; }
+.wf-node[data-run] .wf-tile { box-shadow: 0 0 0 2px var(--accent), 0 0 24px -2px var(--accent); }
+.wf-ok { opacity: 0; scale: 0.4; transition: opacity 0.2s, scale 0.3s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.wf-node[data-done] .wf-ok { opacity: 1; scale: 1; }
+@keyframes wf-packet { from { offset-distance: 0%; } to { offset-distance: 100%; } }
+.wf-packet { animation: wf-packet 1.4s cubic-bezier(0.5, 0, 0.5, 1) infinite; }
+
+/* ── Voice stage (Voice AI page) ── */
+.stage {
+  --stage-bg: #070908;
+  background:
+    radial-gradient(80% 60% at 70% 0%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 70%),
+    radial-gradient(60% 50% at 0% 100%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 70%),
+    var(--stage-bg);
+  color: #f5f4f2;
+  --cream: #f5f4f2;
+  --muted: #a5a8a3;
+  --faint: #6c706b;
+  --line: #242826;
+  --line-bright: #3a3f3c;
+  --ink: #101312;
+  --surface-2: #181c1a;
+  --canvas: #070908;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb, .orb-breathe, .wf-packet { animation: none !important; }
+  .rise-w > span { animation: none !important; transform: none !important; }
+  .wf-edge { stroke-dashoffset: 0 !important; transition: none; }
+  .wf-node { opacity: 1 !important; scale: 1 !important; }
 }

@@ -36,7 +36,7 @@ export function UseCases() {
       <SectionHeading
         title={
           <>
-            One platform. <span className="underline-bar">Every industry.</span>
+            One platform. <span className="text-muted">Every industry.</span>
           </>
         }
         copy="The same agents, shaped to the calls your industry actually makes and receives. Here's where teams put Fiaxe to work."

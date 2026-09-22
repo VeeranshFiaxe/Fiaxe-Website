@@ -11,15 +11,15 @@ function Frame({ accent, title, children }: { accent: string; title: string; chi
     <div
       data-anim
       style={v({ "--accent": accent })}
-      className="relative aspect-[16/11] w-full overflow-hidden rounded-2xl border border-line bg-canvas shadow-2xl shadow-black/20"
+      className="relative aspect-[16/11] w-full overflow-hidden rounded-3xl border border-line bg-canvas shadow-[var(--shadow)]"
     >
-      <div className="flex h-8 items-center gap-1.5 border-b border-line bg-ink px-3">
+      <div className="flex h-9 items-center gap-1.5 border-b border-line bg-ink px-4">
         <span className="size-2 rounded-full bg-line-bright" />
         <span className="size-2 rounded-full bg-line-bright" />
         <span className="size-2 rounded-full bg-line-bright" />
         <span className="ml-3 truncate font-mono text-[10px] tracking-wider text-faint">{title}</span>
       </div>
-      <div className="absolute inset-x-0 top-8 bottom-0">{children}</div>
+      <div className="absolute inset-x-0 top-9 bottom-0">{children}</div>
     </div>
   );
 }

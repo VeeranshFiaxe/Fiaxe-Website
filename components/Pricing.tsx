@@ -113,7 +113,7 @@ export function Pricing() {
         as="h1"
         title={
           <>
-            Pricing that scales <span className="underline-bar">with your calls.</span>
+            Pricing that scales <span className="text-muted">with your calls.</span>
           </>
         }
         copy="Transparent per-minute pricing on bundled minutes. No platform fees, no seat licenses, pay for conversations, not software."

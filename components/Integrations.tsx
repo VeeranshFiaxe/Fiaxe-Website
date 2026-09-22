@@ -168,7 +168,7 @@ export function Integrations() {
         <SectionHeading
           title={
             <>
-              Wired into the tools <span className="underline-bar">you already use.</span>
+              Wired into the tools <span className="text-muted">you already use.</span>
             </>
           }
           copy="Calls, outcomes, and data flow straight into your CRM, calendar, and messaging, no manual exports, no copy-paste."

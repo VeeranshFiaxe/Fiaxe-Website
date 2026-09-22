@@ -20,9 +20,9 @@ export function Cta() {
                 First 100 minutes free
               </span>
             </div>
-            <h2 className="mt-6 font-display text-4xl font-medium tracking-tight text-balance md:text-6xl">
+            <h2 className="mt-6 display text-4xl text-balance md:text-6xl">
               Ready for voice AI that{" "}
-              <span className="underline-bar">actually works?</span>
+              <span className="text-muted">actually works?</span>
             </h2>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted">
               Book a free discovery call, we&apos;ll show you exactly how a custom Fiaxe agent
@@ -32,7 +32,7 @@ export function Cta() {
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <Link
                 href="/contact-us"
-                className="rounded-full bg-blue px-7 py-4 font-mono text-xs font-medium tracking-[0.14em] text-white uppercase shadow-sm transition-colors hover:bg-blue-bright"
+                className="rounded-full bg-cream px-7 py-4 font-mono text-xs font-medium tracking-[0.14em] text-canvas uppercase transition-colors hover:opacity-85"
               >
                 Book a discovery call →
               </Link>

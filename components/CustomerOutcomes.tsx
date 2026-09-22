@@ -57,7 +57,7 @@ export function CustomerOutcomes() {
       <SectionHeading
         title={
           <>
-            What changes once <span className="underline-bar">Fiaxe answers.</span>
+            What changes once <span className="text-muted">Fiaxe answers.</span>
           </>
         }
         copy="The stories above share a pattern. Here's what consistently changes for a business once a custom Fiaxe agent is handling its calls."

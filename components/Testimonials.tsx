@@ -141,8 +141,8 @@ export function Testimonials() {
       <div className="max-w-2xl md:col-start-1 md:row-start-1 md:flex md:h-[460px] md:items-center">
         <div className="md:-translate-y-2.5">
           <Reveal delay={0.06}>
-            <h2 className="font-display text-4xl font-medium tracking-tight text-balance md:text-5xl">
-              What our customers <span className="underline-bar">tell us.</span>
+            <h2 className="display text-4xl text-balance md:text-5xl">
+              What our customers <span className="text-muted">tell us.</span>
             </h2>
           </Reveal>
         </div>

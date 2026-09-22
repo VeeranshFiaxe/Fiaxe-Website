@@ -39,7 +39,7 @@ const AgentRow = memo(function AgentRow({
 
       <div className="mt-5 flex items-center gap-3">
         <span
-          className={`grid size-10 shrink-0 place-items-center rounded-xl text-white transition-colors ${
+          className={`grid size-10 shrink-0 place-items-center rounded-xl text-canvas transition-colors ${
             playing ? "bg-blue-bright" : "bg-blue group-hover:bg-blue-bright"
           }`}
         >
@@ -193,7 +193,7 @@ export function AgentsStrip() {
       <SectionHeading
         title={
           <>
-            Every agent, <span className="underline-bar">on call for you.</span>
+            Every agent, <span className="text-muted">on call for you.</span>
           </>
         }
         copy="A custom voice agent for every job, from support and bookings to collections and recruitment. Press play to hear a real sample call from each one."

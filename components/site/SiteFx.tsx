@@ -8,7 +8,7 @@ import { useEffect } from "react";
      data-reveal       fades/slides in once when scrolled into view (sets data-in)
                        (--d steps of 80ms, or --delay, stagger it)
      data-anim         CSS animations inside pause while off screen
-     .tilt             card leans toward the cursor with a spotlight
+     .tilt             card gets a spotlight that follows the cursor
      data-magnetic     element drifts toward the cursor
 
    One IntersectionObserver per kind and one pointer listener for the page,
@@ -60,10 +60,7 @@ export function SiteFx() {
 
     const reset = (el: HTMLElement | null, kind: "tilt" | "mag") => {
       if (!el) return;
-      if (kind === "tilt") {
-        el.style.setProperty("--rx", "0deg");
-        el.style.setProperty("--ry", "0deg");
-      } else el.style.transform = "";
+      if (kind === "mag") el.style.transform = "";
     };
 
     const paint = () => {
@@ -73,13 +70,11 @@ export function SiteFx() {
         const px = (x - r.left) / r.width, py = (y - r.top) / r.height;
         tilt.style.setProperty("--mx", `${px * 100}%`);
         tilt.style.setProperty("--my", `${py * 100}%`);
-        tilt.style.setProperty("--rx", `${(0.5 - py) * 7}deg`);
-        tilt.style.setProperty("--ry", `${(px - 0.5) * 7}deg`);
       }
       if (mag) {
         const r = mag.getBoundingClientRect();
         const dx = x - (r.left + r.width / 2), dy = y - (r.top + r.height / 2);
-        mag.style.transform = `translate(${dx * 0.25}px, ${dy * 0.35}px)`;
+        mag.style.transform = `translate(${dx * 0.15}px, ${dy * 0.2}px)`;
       }
     };
 

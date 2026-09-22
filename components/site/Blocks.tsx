@@ -1,12 +1,48 @@
 import Link from "next/link";
-import type { CSSProperties, ReactNode } from "react";
+import { Fragment, type CSSProperties, type ReactNode } from "react";
 import { CLIENTS } from "@/lib/clients";
 
-/* Server-rendered building blocks for the company-wide pages. Motion comes
-   from data attributes picked up by components/site/SiteFx.tsx, so these
-   ship no JS of their own. */
+/* Server-rendered building blocks shared by every page, so the whole site
+   speaks one design language: light display type, pill buttons, gradient
+   orbs and hairline rules. Motion comes from CSS and the data attributes
+   that components/site/SiteFx.tsx watches, so these ship no JS. */
 
 const vars = (v: Record<string, string | number>) => v as CSSProperties;
+
+/* Headline whose words rise in one by one. Plays on load for heroes;
+   inside a [data-reveal] box it waits until scrolled into view. */
+export function Headline({
+  text,
+  as: Tag = "h2",
+  className = "",
+  delay = 0,
+}: {
+  text: string;
+  as?: "h1" | "h2" | "h3";
+  className?: string;
+  delay?: number;
+}) {
+  const words = text.split(" ");
+  return (
+    <Tag className={className} style={vars({ "--delay": `${delay}s` })}>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden>
+        {words.map((w, i) => (
+          <Fragment key={i}>
+            <span className="rise-w">
+              <span style={vars({ "--i": i })}>{w}</span>
+            </span>
+            {i < words.length - 1 && " "}
+          </Fragment>
+        ))}
+      </span>
+    </Tag>
+  );
+}
+
+export function Eyebrow({ children, className = "" }: { children: ReactNode; className?: string }) {
+  return <p className={`mono-label flex items-center gap-2 ${className}`}>{children}</p>;
+}
 
 export function Section({
   id,
@@ -15,42 +51,45 @@ export function Section({
   copy,
   aside,
   children,
+  className = "",
+  compact = false,
 }: {
   id?: string;
   eyebrow?: string;
-  title: ReactNode;
+  title: string;
   copy?: string;
   /* right-aligned slot next to the heading, e.g. a "view all" link */
   aside?: ReactNode;
   children?: ReactNode;
+  className?: string;
+  /* less space above and below, for long pages with many sections */
+  compact?: boolean;
 }) {
   return (
-    <section id={id} className="mx-auto max-w-7xl scroll-mt-20 px-5 py-20 md:px-8 md:py-28">
-      <div className="flex flex-wrap items-end justify-between gap-6">
-        <div>
-          {eyebrow && (
-            <p data-reveal className="mono-label mb-4 flex items-center gap-2">
-              <span className="h-px w-6 bg-blue" />
-              {eyebrow}
-            </p>
-          )}
-          <h2
-            data-reveal
-            style={vars({ "--d": 1 })}
-            className="max-w-3xl font-display text-3xl font-medium tracking-tight text-balance md:text-5xl md:leading-[1.08]"
-          >
-            {title}
-          </h2>
+    <section
+      id={id}
+      className={`mx-auto max-w-7xl scroll-mt-28 px-5 md:px-8 ${compact ? "py-12 md:py-16" : "py-20 md:py-28"} ${className}`}
+    >
+      <div className="grid gap-6 border-t border-line pt-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+        <div data-reveal>
+          {eyebrow && <Eyebrow className="mb-6">{eyebrow}</Eyebrow>}
+          <Headline text={title} className="display max-w-3xl text-[2.25rem] text-balance md:text-[3.25rem]" />
           {copy && (
-            <p data-reveal style={vars({ "--d": 2 })} className="mt-5 max-w-2xl text-lg leading-relaxed text-muted text-pretty">
-              {copy}
-            </p>
+            <p className="mt-5 max-w-2xl text-[17px] leading-relaxed text-muted text-pretty">{copy}</p>
           )}
         </div>
         {aside}
       </div>
-      {children && <div className="mt-12 md:mt-16">{children}</div>}
+      {children && <div className={compact ? "mt-10 md:mt-12" : "mt-12 md:mt-16"}>{children}</div>}
     </section>
+  );
+}
+
+export function ViewAll({ href, children }: { href: string; children: ReactNode }) {
+  return (
+    <Link href={href} className="btn btn-ghost btn-sm w-fit">
+      {children} <span aria-hidden>→</span>
+    </Link>
   );
 }
 
@@ -59,7 +98,7 @@ type Crumb = { label: string; href?: string };
 export function Breadcrumbs({ items }: { items: Crumb[] }) {
   return (
     <nav aria-label="Breadcrumb" className="mb-8">
-      <ol className="flex flex-wrap items-center gap-2 text-sm text-muted">
+      <ol className="flex flex-wrap items-center gap-2 text-[13px] text-muted">
         {items.map((it, i) => (
           <li key={it.label} className="flex items-center gap-2">
             {i > 0 && <span aria-hidden className="text-faint">/</span>}
@@ -79,30 +118,69 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
   );
 }
 
+/* Soft gradient orb in an offering's accent: the recurring visual mark. */
+export function Orb({
+  accent,
+  className = "",
+  grain = true,
+  breathe = false,
+}: {
+  accent: string;
+  className?: string;
+  grain?: boolean;
+  breathe?: boolean;
+}) {
+  return (
+    <span
+      aria-hidden
+      data-anim
+      className={`orb block ${grain ? "orb-grain" : ""} ${breathe ? "orb-breathe" : ""} ${className}`}
+      style={vars({ "--accent": accent })}
+    />
+  );
+}
+
 export function PageIntro({
   crumbs,
   eyebrow,
   title,
   copy,
   children,
+  accent,
 }: {
   crumbs?: Crumb[];
   eyebrow?: string;
-  title: ReactNode;
+  title: string;
   copy?: string;
   children?: ReactNode;
+  accent?: string;
 }) {
   return (
     <section className="relative isolate overflow-hidden">
-      <div aria-hidden className="grid-bg absolute inset-0 -z-10 opacity-60" />
-      <div className="mx-auto max-w-7xl px-5 pt-28 pb-10 md:px-8 md:pt-36">
+      {accent && (
+        <Orb accent={accent} className="absolute -top-24 -right-24 -z-10 w-[420px] opacity-70 blur-2xl md:w-[560px]" />
+      )}
+      <div className="mx-auto max-w-7xl px-5 pt-32 pb-12 md:px-8 md:pt-40 md:pb-16">
         {crumbs && <Breadcrumbs items={crumbs} />}
-        {eyebrow && <p className="mono-label mb-4">{eyebrow}</p>}
-        <h1 className="max-w-4xl font-display text-4xl font-medium leading-[1.05] tracking-tight text-balance md:text-[4rem]">
-          {title}
-        </h1>
-        {copy && <p className="mt-6 max-w-2xl text-lg leading-relaxed text-muted text-pretty">{copy}</p>}
-        {children && <div className="mt-9 flex flex-wrap gap-3">{children}</div>}
+        {eyebrow && <Eyebrow className="fade-up mb-6">{eyebrow}</Eyebrow>}
+        <Headline
+          as="h1"
+          text={title}
+          className="display max-w-4xl text-[2.75rem] text-balance md:text-[4.75rem]"
+        />
+        {copy && (
+          <p
+            className="fade-up mt-7 max-w-2xl text-lg leading-relaxed text-muted text-pretty"
+            style={vars({ "--delay": "0.3s" })}
+          >
+            {copy}
+          </p>
+        )}
+        {children && (
+          <div className="fade-up mt-9 flex flex-wrap gap-3" style={vars({ "--delay": "0.4s" })}>
+            {children}
+          </div>
+        )}
       </div>
     </section>
   );
@@ -112,26 +190,29 @@ export function Button({
   href,
   children,
   variant = "primary",
-  accent,
+  size,
 }: {
   href: string;
   children: ReactNode;
   variant?: "primary" | "ghost";
+  size?: "sm";
+  /* kept for older call sites; buttons are monochrome now */
   accent?: string;
 }) {
-  const styles =
-    variant === "primary"
-      ? "bg-[var(--btn,var(--blue))] text-black hover:brightness-110"
-      : "border border-line-bright text-cream hover:border-cream";
   return (
     <Link
       href={href}
       data-magnetic
-      style={accent ? vars({ "--btn": accent }) : undefined}
-      className={`inline-flex items-center gap-2 rounded-full px-6 py-3.5 font-mono text-xs font-semibold tracking-[0.14em] uppercase transition-[filter,border-color] ${styles}`}
+      className={`btn ${variant === "primary" ? "btn-primary" : "btn-ghost"} ${size === "sm" ? "btn-sm" : ""}`}
     >
       {children}
     </Link>
+  );
+}
+
+export function Chip({ children }: { children: ReactNode }) {
+  return (
+    <span className="rounded-full border border-line bg-ink px-2.5 py-1 text-[12px] text-muted">{children}</span>
   );
 }
 
@@ -162,32 +243,27 @@ export function OfferingCard({
       href={href}
       data-reveal
       style={vars({ "--accent": accent, "--d": index ?? 0 })}
-      className={`tilt group flex h-full flex-col overflow-hidden rounded-2xl border border-line bg-ink p-6 md:p-7 ${className}`}
+      className={`tilt group flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-ink p-6 md:p-7 ${className}`}
     >
       {children}
       <div className="flex items-center justify-between">
-        <span className="flex items-center gap-2 font-mono text-[11px] tracking-[0.14em] text-faint uppercase">
-          <span className="size-2 rounded-full" style={{ background: accent }} />
-          {index !== undefined ? `0${index + 1}` : ""}
-        </span>
+        <Orb accent={accent} className="size-9 transition-transform duration-500 group-hover:scale-110" />
         {badge && (
           <span className="rounded-full border border-line px-2.5 py-1 font-mono text-[10px] tracking-wider text-muted uppercase">
             {badge}
           </span>
         )}
       </div>
-      <h3 className="mt-5 text-2xl font-medium tracking-tight">{name}</h3>
+      <h3 className="mt-6 text-2xl font-normal tracking-tight">{name}</h3>
       <p className="mt-2 flex-1 text-[15px] leading-relaxed text-muted">{tagline}</p>
       {tags.length > 0 && (
         <div className="mt-5 flex flex-wrap gap-1.5">
           {tags.map((t) => (
-            <span key={t} className="rounded-full bg-surface-2 px-2.5 py-1 text-[12px] text-muted">
-              {t}
-            </span>
+            <Chip key={t}>{t}</Chip>
           ))}
         </div>
       )}
-      <span className="mt-6 flex items-center gap-2 font-mono text-[11px] tracking-[0.14em] uppercase" style={{ color: accent }}>
+      <span className="mt-6 flex items-center gap-2 text-sm font-medium">
         Explore
         <span className="inline-block transition-transform duration-300 group-hover:translate-x-1.5">→</span>
       </span>
@@ -195,27 +271,42 @@ export function OfferingCard({
   );
 }
 
+/* Clean spec-sheet grid: hairline rules instead of boxed cards. */
 export function FeatureGrid({ items, accent }: { items: { title: string; copy: string }[]; accent: string }) {
   return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid border-t border-l border-line sm:grid-cols-2 lg:grid-cols-3">
       {items.map((f, i) => (
         <div
           key={f.title}
           data-reveal
           style={vars({ "--accent": accent, "--d": i % 3 })}
-          className="tilt rounded-2xl border border-line bg-ink p-6 md:p-7"
+          className="tilt border-r border-b border-line p-7 md:p-9"
         >
-          <span
-            className="grid size-10 place-items-center rounded-xl font-mono text-xs font-semibold"
-            style={{ background: `${accent}1f`, color: accent }}
-          >
-            0{i + 1}
-          </span>
-          <h3 className="mt-5 font-medium">{f.title}</h3>
+          <span className="font-mono text-xs text-faint">0{i + 1}</span>
+          <h3 className="mt-10 text-lg font-medium tracking-tight">{f.title}</h3>
           <p className="mt-2 text-[15px] leading-relaxed text-muted">{f.copy}</p>
         </div>
       ))}
     </div>
+  );
+}
+
+/* Big-number row, used for "by the numbers" bands. */
+export function Stats({ items }: { items: { value: ReactNode; label: string }[] }) {
+  return (
+    <dl className="grid grid-cols-2 border-t border-line md:grid-cols-4">
+      {items.map((s, i) => (
+        <div
+          key={s.label}
+          data-reveal
+          style={vars({ "--d": i })}
+          className={`border-b border-line py-8 pr-6 md:border-b-0 md:py-10 ${i > 0 ? "md:border-l md:pl-8" : ""} ${i % 2 ? "border-l pl-6 md:pl-8" : ""}`}
+        >
+          <dd className="display text-5xl md:text-6xl">{s.value}</dd>
+          <dt className="mt-3 text-sm text-muted">{s.label}</dt>
+        </div>
+      ))}
+    </dl>
   );
 }
 
@@ -228,18 +319,22 @@ export const PROCESS_STEPS = [
 
 /* Numbered steps joined by a line that fills as the row scrolls into view
    (CSS scroll-driven animation; static where unsupported). */
-export function Steps({ items = PROCESS_STEPS }: { items?: { title: string; copy: string }[] }) {
+export function Steps({ items = PROCESS_STEPS }: { items?: { title: string; copy: string; meta?: string }[] }) {
+  const cols = items.length > 4 ? "lg:grid-cols-5" : "lg:grid-cols-4";
   return (
     <div className="relative">
-      <div aria-hidden className="absolute top-[7px] right-0 left-0 hidden h-px bg-line lg:block">
-        <div className="progress-line h-full bg-blue" />
+      <div aria-hidden className="absolute top-[5px] right-0 left-0 hidden h-px bg-line lg:block">
+        <div className="progress-line h-full bg-cream" />
       </div>
-      <ol className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+      <ol className={`grid gap-10 sm:grid-cols-2 lg:gap-8 ${cols}`}>
         {items.map((s, i) => (
           <li key={s.title} data-reveal style={vars({ "--d": i })} className="relative">
-            <span className="progress-dot relative block size-[15px] rounded-full border-4 border-canvas bg-blue shadow-[0_0_0_1px_var(--blue)]" />
-            <span className="mt-6 block font-mono text-xs text-faint">Step 0{i + 1}</span>
-            <h3 className="mt-2 text-xl font-medium">{s.title}</h3>
+            <span className="progress-dot relative block size-[11px] rounded-full border-2 border-canvas bg-cream shadow-[0_0_0_1px_var(--cream)]" />
+            <span className="mt-6 flex items-center justify-between font-mono text-xs text-faint">
+              <span>Step 0{i + 1}</span>
+              {s.meta && <span>{s.meta}</span>}
+            </span>
+            <h3 className="mt-2 text-xl font-normal tracking-tight">{s.title}</h3>
             <p className="mt-2 text-[15px] leading-relaxed text-muted">{s.copy}</p>
           </li>
         ))}
@@ -251,42 +346,59 @@ export function Steps({ items = PROCESS_STEPS }: { items?: { title: string; copy
 /* Native <details>, so it opens without any JS */
 export function Faq({ items }: { items: { q: string; a: string }[] }) {
   return (
-    <div className="divide-y divide-line border-y border-line">
-      {items.map((f) => (
-        <details key={f.q} className="group py-5">
-          <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-lg font-medium [&::-webkit-details-marker]:hidden">
-            {f.q}
-            <span className="grid size-8 shrink-0 place-items-center rounded-full border border-line transition-transform duration-300 group-open:rotate-45">
-              +
-            </span>
-          </summary>
-          <p className="mt-3 max-w-3xl leading-relaxed text-muted">{f.a}</p>
-        </details>
-      ))}
+    <div className="grid gap-10 lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]">
+      <div className="text-[15px] leading-relaxed text-muted">
+        <p>Can&apos;t find what you&apos;re looking for?</p>
+        <Link href="/contact-us" className="mt-3 inline-block font-medium text-cream underline underline-offset-4">
+          Talk to our team →
+        </Link>
+      </div>
+      <div className="divide-y divide-line border-y border-line">
+        {items.map((f) => (
+          <details key={f.q} className="group py-6">
+            <summary className="flex cursor-pointer list-none items-center justify-between gap-6 text-lg tracking-tight [&::-webkit-details-marker]:hidden">
+              {f.q}
+              <span className="grid size-8 shrink-0 place-items-center rounded-full border border-line text-muted transition-transform duration-300 group-open:rotate-45">
+                +
+              </span>
+            </summary>
+            <p className="mt-3 max-w-3xl leading-relaxed text-muted">{f.a}</p>
+          </details>
+        ))}
+      </div>
     </div>
   );
 }
 
-export function LogoMarquee() {
+/* Client logos in a hairline grid (static, like a trust wall). */
+export function LogoWall({ label = "Trusted by teams at", compact = false }: { label?: string; compact?: boolean }) {
   return (
-    <section className="border-y border-line py-10">
-      <p className="mono-label mb-8 text-center">Trusted by teams at</p>
-      <div className="flex overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-        <div data-anim className="flex shrink-0 animate-marquee items-center hover:[animation-play-state:paused]">
-          {[...CLIENTS, ...CLIENTS].map((c, i) => (
-            <span key={`${c.name}-${i}`} className="flex items-center pr-14">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={c.logo}
-                alt={i < CLIENTS.length ? c.name : ""}
-                loading="lazy"
-                decoding="async"
-                className={`ticker-logo block h-8 w-auto max-w-[150px] object-contain md:h-9 ${c.className ?? ""}`}
-              />
-            </span>
-          ))}
-        </div>
+    <section className={`mx-auto max-w-7xl px-5 md:px-8 ${compact ? "py-10" : "py-16"}`}>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <p className="text-[15px] text-muted">{label}</p>
+        <Link href="/customer-stories" className="btn btn-ghost btn-sm">
+          Read customer stories
+        </Link>
       </div>
+      <ul className="mt-8 grid grid-cols-2 border-t border-l border-line sm:grid-cols-3 lg:grid-cols-6">
+        {CLIENTS.slice(0, 12).map((c, i) => (
+          <li
+            key={c.name}
+            data-reveal
+            style={vars({ "--d": i % 6, "--y": "8px" })}
+            className="grid h-24 place-items-center border-r border-b border-line px-6 md:h-28"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={c.logo}
+              alt={c.name}
+              loading="lazy"
+              decoding="async"
+              className={`ticker-logo block h-7 w-auto max-w-[120px] object-contain md:h-8 ${c.className ?? ""}`}
+            />
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }
@@ -294,34 +406,49 @@ export function LogoMarquee() {
 export function SiteCta({
   title = "Tell us what you're building.",
   copy = "Placeholder: book a free call and we'll point you to the right service or product.",
-  accent,
+  accent = "#8b7cf6",
 }: {
   title?: string;
   copy?: string;
   accent?: string;
 }) {
   return (
-    <section className="mx-auto max-w-7xl px-5 pt-8 pb-16 md:px-8">
+    <section className="mx-auto max-w-7xl px-5 pt-8 pb-20 md:px-8">
       <div
-        data-anim
         data-reveal
-        className="spin-border relative isolate overflow-hidden rounded-3xl px-6 py-16 text-center md:py-24"
-        style={accent ? vars({ "--blue": accent }) : undefined}
+        className="relative isolate grid items-center gap-10 overflow-hidden rounded-[2rem] border border-line bg-ink px-6 py-14 md:grid-cols-[minmax(0,1fr)_auto] md:px-14 md:py-20"
       >
-        <div aria-hidden className="grid-bg absolute inset-0 -z-10 opacity-50" />
-        <h2 className="mx-auto max-w-3xl font-display text-4xl font-medium tracking-tight text-balance md:text-6xl">
-          {title}
-        </h2>
-        <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-muted">{copy}</p>
-        <div className="mt-10 flex flex-wrap justify-center gap-3">
-          <Button href="/contact-us" accent={accent}>
-            Book a call →
-          </Button>
-          <Button href="/services" variant="ghost">
-            Browse services
-          </Button>
+        <div>
+          <Headline text={title} className="display max-w-2xl text-4xl text-balance md:text-6xl" />
+          <p className="mt-5 max-w-xl text-lg leading-relaxed text-muted">{copy}</p>
+          <div className="mt-9 flex flex-wrap gap-3">
+            <Button href="/contact-us">Book a call</Button>
+            <Button href="/#solutions" variant="ghost">
+              Browse solutions
+            </Button>
+          </div>
         </div>
+        <Orb accent={accent} breathe className="mx-auto w-44 md:w-64" />
       </div>
     </section>
+  );
+}
+
+/* Sticky row of in-page anchors under the hero (Accenture-style). */
+export function SubNav({ items }: { items: { label: string; href: string }[] }) {
+  return (
+    <div className="sticky top-16 z-30 border-y border-line bg-canvas/85 backdrop-blur-md">
+      <nav className="subnav no-scrollbar mx-auto flex max-w-7xl gap-1 overflow-x-auto px-5 md:px-8">
+        {items.map((i) => (
+          <a
+            key={i.href}
+            href={i.href}
+            className="shrink-0 border-b-2 border-transparent px-3 py-3.5 text-[14px] whitespace-nowrap text-muted transition-colors hover:border-cream hover:text-cream"
+          >
+            {i.label}
+          </a>
+        ))}
+      </nav>
+    </div>
   );
 }

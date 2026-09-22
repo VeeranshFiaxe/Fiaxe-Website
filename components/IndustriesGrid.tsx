@@ -109,9 +109,9 @@ export function IndustriesGrid() {
         <div className="order-1 lg:order-2 lg:col-span-5">
           <div className="lg:sticky lg:top-28">
             <Reveal delay={0.06}>
-              <h2 className="mt-6 font-display text-4xl font-medium tracking-tight text-balance md:text-5xl">
+              <h2 className="mt-6 display text-4xl text-balance md:text-5xl">
                 Built for businesses{" "}
-                <span className="underline-bar">that run on calls.</span>
+                <span className="text-muted">that run on calls.</span>
               </h2>
             </Reveal>
             <Reveal delay={0.1}>
@@ -123,7 +123,7 @@ export function IndustriesGrid() {
             <Reveal delay={0.14}>
               <Link
                 href="/contact-us"
-                className="mt-8 inline-flex rounded-full bg-blue px-6 py-3 font-mono text-[11px] font-medium tracking-[0.14em] text-white uppercase shadow-sm transition-colors hover:bg-blue-bright"
+                className="mt-8 inline-flex rounded-full bg-cream px-6 py-3 font-mono text-[11px] font-medium tracking-[0.14em] text-canvas uppercase transition-colors hover:opacity-85"
               >
                 Build my agent →
               </Link>

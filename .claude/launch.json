@@ -1,0 +1,33 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "dev"
+      ],
+      "port": 3000
+    },
+    {
+      "name": "static-out",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "C:/Users/veera/AppData/Local/Temp/claude/C--Users-veera-Fiaxe/7b263bbe-c937-4a30-8909-7070afd8af0d/scratchpad/serve.js",
+        "out"
+      ],
+      "port": 3100
+    },
+    {
+      "name": "perf-audit-out",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "C:/Users/veera/AppData/Local/Temp/claude/C--Users-veera-Fiaxe/d7151631-bba8-4f5e-90a9-cbd9ff29322e/scratchpad/serve.js",
+        "C:/Users/veera/Fiaxe-perf/out",
+        "3200"
+      ],
+      "port": 3200
+    }
+  ]
+}

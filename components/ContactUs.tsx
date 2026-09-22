@@ -66,7 +66,7 @@ export function ContactUs() {
           <div className="flex h-full flex-col p-6 md:p-8">
             <p className="mono-label">Get in touch & book demo</p>
             <h1 className="mt-6 font-display text-3xl font-medium tracking-tight text-balance md:text-4xl">
-              Let&apos;s talk about <span className="underline-bar">your business.</span>
+              Let&apos;s talk about <span className="text-muted">your business.</span>
             </h1>
             
             
@@ -135,7 +135,7 @@ export function ContactUs() {
             <button
               type="submit"
               disabled={status === "sending"}
-              className="mt-1 rounded-xl bg-blue px-6 py-3.5 font-mono text-xs font-medium tracking-[0.14em] text-white uppercase transition-colors hover:bg-blue-bright disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-1 rounded-xl bg-cream px-6 py-3.5 font-mono text-xs font-medium tracking-[0.14em] text-canvas uppercase transition-colors hover:opacity-85 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {status === "sending" ? "Sending…" : "Submit request & book call →"}
             </button>

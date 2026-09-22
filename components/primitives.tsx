@@ -43,7 +43,7 @@ export function SectionHeading({
   return (
     <div className="mb-12 md:mb-16">
       <Reveal onLoad={onLoad}>
-        <Heading className="max-w-3xl font-display text-4xl font-medium tracking-tight text-balance md:text-5xl lg:text-[3.3rem] lg:leading-[1.07]">
+        <Heading className="max-w-3xl display text-4xl text-balance md:text-5xl lg:text-[3.3rem] lg:leading-[1.07]">
           {title}
         </Heading>
       </Reveal>

@@ -4,11 +4,6 @@
 
    Copy below is placeholder until the real content lands. */
 
-/* Shapes the particle model can take (components/site/ParticleModel.tsx).
-   Each offering owns one, so the same object re-forms as you move between
-   them and every service gets a recognisable silhouette. */
-export type ShapeKey = "globe" | "browser" | "flow" | "blocks" | "brain" | "wave";
-
 export type Offering = {
   slug: string;
   name: string;
@@ -21,7 +16,6 @@ export type Offering = {
   faqs: { q: string; a: string }[];
   /* colour that tells this offering apart everywhere it appears */
   accent: string;
-  shape: ShapeKey;
   /* short keyword chips shown on cards */
   tags: string[];
 };
@@ -56,7 +50,6 @@ export const SERVICES: Offering[] = [
     features: placeholderFeatures("Web"),
     faqs: placeholderFaqs,
     accent: "#5b8cff",
-    shape: "browser",
     tags: ["Websites", "E-commerce", "Web apps"],
   },
   {
@@ -68,7 +61,6 @@ export const SERVICES: Offering[] = [
     features: placeholderFeatures("Automation"),
     faqs: placeholderFaqs,
     accent: "#ff8a3d",
-    shape: "flow",
     tags: ["Workflows", "Integrations", "AI agents"],
   },
   {
@@ -80,7 +72,6 @@ export const SERVICES: Offering[] = [
     features: placeholderFeatures("Tooling"),
     faqs: placeholderFaqs,
     accent: "#a878ff",
-    shape: "blocks",
     tags: ["Dashboards", "CRMs", "Portals"],
   },
   {
@@ -92,7 +83,6 @@ export const SERVICES: Offering[] = [
     features: placeholderFeatures("Training"),
     faqs: placeholderFaqs,
     accent: "#ffc53d",
-    shape: "brain",
     tags: ["Workshops", "Leadership", "Playbooks"],
   },
 ];
@@ -107,7 +97,6 @@ export const PRODUCTS: Product[] = [
     features: [],
     faqs: [],
     accent: "#18e299",
-    shape: "wave",
     tags: ["Inbound", "Outbound", "28+ languages"],
     status: "live",
     href: "/products/voice-ai",
@@ -117,22 +106,7 @@ export const PRODUCTS: Product[] = [
       { label: "Customer stories", href: "/customer-stories" },
     ],
   },
-  {
-    slug: "product-two",
-    name: "Product Two",
-    tagline: "Placeholder product tagline.",
-    summary: "Placeholder: short description of the next Fiaxe product.",
-    features: placeholderFeatures("Product"),
-    faqs: placeholderFaqs,
-    accent: "#8a8f98",
-    shape: "globe",
-    tags: ["Coming soon"],
-    status: "coming-soon",
-  },
 ];
 
 export const serviceHref = (s: Offering) => `/services/${s.slug}`;
 export const productHref = (p: Product) => p.href ?? `/products/${p.slug}`;
-
-/* Products that render through the generic template */
-export const TEMPLATE_PRODUCTS = PRODUCTS.filter((p) => !p.href);

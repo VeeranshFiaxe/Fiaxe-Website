@@ -54,7 +54,7 @@ export function Nav() {
     <header
       className={`nav-enter fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
         scrolled || open
-          ? "border-b border-line bg-canvas/85 backdrop-blur-md"
+          ? "glass border-b border-line bg-canvas/85 backdrop-blur-md"
           : "border-b border-transparent bg-transparent"
       }`}
     >

@@ -27,8 +27,15 @@ const LEAVE = 0.25; // the F leaves a slot when the slot's centre nears the top,
 const ARRIVE = 0.72; // …and lands in the next as its centre reaches this one
 const MIN_FLIGHT = 0.4; // shortest flight, in viewport heights of scroll
 const FOLLOW = 5; // spring stiffness (rad/s, critically damped): how closely the F tracks the scroll
-const MAX_SPEED = 1.8; // slots per second, so a fast flick becomes a glide, not a dart
-const OVERSCAN = 0.2; // canvas extends this fraction of the viewport above and below it
+// top speed in slots per second near the target, so the last stretch glides,
+// not darts; each slot further behind multiplies it by CATCH_UP, so after a
+// big jump the F races to catch up, then slows as it arrives
+const MAX_SPEED = 1.8;
+const CATCH_UP = 2.2;
+// canvas extends this fraction of the viewport above and below it; less on
+// low-power machines (.lite, see app/layout.tsx), where every pixel counts
+const OVERSCAN_FULL = 0.2;
+const OVERSCAN_LITE = 0.1;
 const GHOST = 0.12;
 
 const ease = (u: number) => {
@@ -56,10 +63,13 @@ export function FTrail({ children }: { children: ReactNode }) {
     }));
     if (!slots.length) return;
 
+    const OVERSCAN = document.documentElement.classList.contains("lite") ? OVERSCAN_LITE : OVERSCAN_FULL;
     let engine: TrailEngine | null = null;
     let cancelled = false;
     let raf = 0;
     let lastKey = "";
+    let lastTop: number | null = null; // where the canvas sits, in wrapper px
+    let heroDocked = true; // only then does the pointer move the F
     const pointer = { x: 0, y: 0, sx: 0, sy: 0 };
     let lastNow = 0;
 
@@ -130,8 +140,13 @@ export function FTrail({ children }: { children: ReactNode }) {
       }
       if (p < 0) p = goal;
       else if (dt) {
-        v += (FOLLOW * FOLLOW * (goal - p) - 2 * FOLLOW * v) * dt;
-        v = Math.max(-MAX_SPEED, Math.min(MAX_SPEED, v));
+        const gap = Math.abs(goal - p);
+        // far behind: a stiffer spring and a higher cap, both growing with the gap
+        // (at most 4x, which keeps the step stable at the longest frame)
+        const w = FOLLOW * Math.min(4, 1 + Math.max(0, gap - 1));
+        const cap = MAX_SPEED * Math.pow(CATCH_UP, Math.max(0, gap - 0.5));
+        v += (w * w * (goal - p) - 2 * w * v) * dt;
+        v = Math.max(-cap, Math.min(cap, v));
         p += v * dt;
       }
       if (Math.abs(goal - p) < 0.0005 && Math.abs(v) < 0.005) {
@@ -176,8 +191,16 @@ export function FTrail({ children }: { children: ReactNode }) {
         slots.forEach((sl, j) => setGhost(sl, j === i ? GHOST * e : j === i + 1 ? GHOST * (1 - e) : GHOST));
       }
 
-      // write: pin the canvas over the viewport, then draw in its coordinates
-      const top = y - boxTop - OVERSCAN * vh;
+      // write: pin the canvas over the viewport, then draw in its coordinates.
+      // A docked F rides the page with its word, so while it still fits the
+      // canvas where it is, the canvas stays put and scrolling redraws nothing.
+      let top = y - boxTop - OVERSCAN * vh;
+      heroDocked = !flying && slots[i].hero;
+      if (!flying && !heroDocked && lastTop !== null) {
+        const gy = current.y - boxTop;
+        if (gy - current.size >= lastTop && gy + current.size <= lastTop + vh * (1 + 2 * OVERSCAN)) top = lastTop;
+      }
+      lastTop = top;
       cv.style.transform = `translate3d(0, ${top}px, 0)`;
       Object.assign(out, current, { y: current.y - boxTop - top });
       const key = [top, out.x, out.y, out.size, out.yaw, out.pitch, out.roll].map((n) => n.toFixed(2)).join();
@@ -188,8 +211,7 @@ export function FTrail({ children }: { children: ReactNode }) {
 
       const moving =
         p !== goal ||
-        (!flying && slots[i].hero) ||
-        Math.abs(pointer.x - pointer.sx) + Math.abs(pointer.y - pointer.sy) > 0.002;
+        heroDocked; // the hero sways (and follows the pointer) while docked
       if (moving) raf = requestAnimationFrame(frame);
       else lastNow = 0;
     };
@@ -204,7 +226,7 @@ export function FTrail({ children }: { children: ReactNode }) {
     const onPointer = (e: PointerEvent) => {
       pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
       pointer.y = (e.clientY / window.innerHeight) * 2 - 1;
-      kick();
+      if (heroDocked) kick();
     };
     window.addEventListener("scroll", kick, { passive: true });
     window.addEventListener("resize", onResize);
@@ -221,20 +243,27 @@ export function FTrail({ children }: { children: ReactNode }) {
     const idle =
       (window as Window & { requestIdleCallback?: (cb: () => void, o?: { timeout: number }) => number })
         .requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 200));
-    idle(async () => {
-      const { createTrail } = await import("@/lib/f-trail-engine");
-      if (cancelled) return;
-      try {
-        engine = createTrail(cv, root.dataset.theme !== "light");
-        setReady(true);
-        kick();
-      } catch {
-        // no WebGL: the flat Fs stay
-      }
-    }, { timeout: 800 });
+    const start = () =>
+      idle(async () => {
+        const { createTrail } = await import("@/lib/f-trail-engine");
+        if (cancelled) return;
+        try {
+          engine = createTrail(cv, root.dataset.theme !== "light");
+          setReady(true);
+          kick();
+        } catch {
+          // no WebGL: the flat Fs stay
+        }
+      }, { timeout: 800 });
+    // while the home intro plays (IntroBox marks it) the page is hidden, so
+    // wait: two 3D scenes at once is what makes weak machines stutter
+    const INTRO_END = "fx:intro-end";
+    if (root.dataset.intro === "playing") window.addEventListener(INTRO_END, start, { once: true });
+    else start();
 
     return () => {
       cancelled = true;
+      window.removeEventListener(INTRO_END, start);
       cancelAnimationFrame(raf);
       window.removeEventListener("scroll", kick);
       window.removeEventListener("resize", onResize);

@@ -99,12 +99,21 @@ function copyPage(vw: number, vh: number) {
     copy.querySelectorAll<SVGElement>(".f-ghost").forEach((g) => (g.style.opacity = ""));
     const copies = copy.querySelectorAll<HTMLElement>(".orb");
     el.querySelectorAll<HTMLElement>(".orb").forEach((orb, i) => {
-      const anims = orb.getAnimations();
-      if (!anims.length) return;
-      const times = anims.map((a) => Number(a.currentTime ?? 0));
-      anims.forEach((a, j) => orbs.push([a, times[j]]));
-      copies[i].style.animationDelay = times.map((t) => `${-t}ms`).join(", ");
-      copies[i].style.animationPlayState = "paused";
+      // the orb's own animations (breathing), and its turning wheel (::after)
+      const all = orb.getAnimations({ subtree: true });
+      const time = (a: Animation) => Number(a.currentTime ?? 0);
+      for (const a of all) orbs.push([a, time(a)]);
+      const own = all.filter((a) => a.effect instanceof KeyframeEffect && a.effect.target === orb && !a.effect.pseudoElement);
+      const wheel = all.find((a) => a.effect instanceof KeyframeEffect && a.effect.target === orb && a.effect.pseudoElement === "::after");
+      const copy = copies[i].style;
+      if (own.length) {
+        copy.animationDelay = own.map((a) => `${-time(a)}ms`).join(", ");
+        copy.animationPlayState = "paused";
+      }
+      if (wheel) {
+        copy.setProperty("--orb-delay", `${-time(wheel)}ms`);
+        copy.setProperty("--orb-play", "paused");
+      }
     });
     Object.assign(copy.style, {
       position: "absolute",

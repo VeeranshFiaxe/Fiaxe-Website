@@ -86,9 +86,11 @@ export function VoiceOrbDemo({ accent }: { accent: string }) {
           ref={orb}
           aria-hidden
           data-anim
-          className={`orb orb-grain block w-full transition-transform duration-150 ${playing ? "" : "orb-breathe"}`}
+          className={`orb block w-full transition-transform duration-150 ${playing ? "" : "orb-breathe"}`}
           style={{ "--accent": accent } as CSSProperties}
-        />
+        >
+          <span className="orb-noise" />
+        </span>
         <span className="absolute grid size-16 place-items-center rounded-full bg-white text-black shadow-lg transition-transform group-hover:scale-105">
           {playing ? (
             <svg width="18" height="18" viewBox="0 0 14 14" fill="currentColor" aria-hidden>

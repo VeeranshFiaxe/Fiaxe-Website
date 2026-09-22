@@ -59,9 +59,11 @@ export default function RootLayout({
       className={`${inter.variable} ${mono.variable} h-full antialiased`}
     >
       <head>
-        {/* Light is the default; honor a saved preference if one exists. */}
+        {/* Light is the default; honor a saved preference if one exists.
+            A machine with few cores or little memory gets .lite, which the
+            CSS and the 3D scenes read to render more cheaply. */}
         <InlineScript
-          html={`(function(){try{var t=localStorage.getItem("theme");document.documentElement.setAttribute("data-theme",t==="dark"?"dark":"light");}catch(e){}document.documentElement.classList.add("fx");})();`}
+          html={`(function(){var d=document.documentElement;try{var t=localStorage.getItem("theme");d.setAttribute("data-theme",t==="dark"?"dark":"light");}catch(e){}d.classList.add("fx");var n=navigator;if((n.hardwareConcurrency||8)<=4||(n.deviceMemory||8)<=4)d.classList.add("lite");})();`}
         />
         <Schema />
       </head>

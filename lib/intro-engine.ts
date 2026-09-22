@@ -242,9 +242,9 @@ function cardGeometry() {
 export function createIntro(o: Opts): IntroEngine {
   const { canvas, items } = o;
   const pal: Palette = { surface: o.surface, text: o.text, muted: o.muted, line: o.line };
-  // modest machine (few cores or little memory): fewer pixels, smaller shadows
-  const nav = navigator as Navigator & { deviceMemory?: number };
-  const low = (nav.hardwareConcurrency ?? 8) <= 4 || (nav.deviceMemory ?? 8) <= 4;
+  // modest machine (.lite: few cores or little memory, set in app/layout.tsx):
+  // fewer pixels, smaller shadows
+  const low = document.documentElement.classList.contains("lite");
   const renderer = new WebGLRenderer({ canvas, antialias: !low, alpha: false, powerPreference: "high-performance" });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, low ? 1 : 1.5));
   renderer.toneMapping = ACESFilmicToneMapping;
@@ -506,6 +506,12 @@ export function createIntro(o: Opts): IntroEngine {
       logoMat.opacity = 0.9;
       lidA = -1.75 * easeInOut(pt / 1.2);
       core.intensity = 3.5 * easeOut(pt / 1.2);
+      // only the box casts shadows, and once the lid is up it holds still:
+      // draw its shadow one last time, then stop redrawing it every frame
+      if (pt > 1.25 && renderer.shadowMap.autoUpdate) {
+        renderer.shadowMap.autoUpdate = false;
+        renderer.shadowMap.needsUpdate = true;
+      }
       camPull = Math.min(1, camPull + dt * 0.55);
     }
     boxRoot.position.y = y;
@@ -513,17 +519,21 @@ export function createIntro(o: Opts): IntroEngine {
     hinge.rotation.x = lidA;
 
     // ── pointer ──
-    raycaster.setFromCamera(pointer, camera);
-    const hits = raycaster.intersectObjects(
-      meshes.filter((m) => m.parent!.visible),
-      false,
-    );
+    // (skipped while the pointer is off the canvas: nothing can be hovered)
+    const pointerOn = pointer.x < 5;
+    if (pointerOn) raycaster.setFromCamera(pointer, camera);
+    const hits = pointerOn
+      ? raycaster.intersectObjects(
+          meshes.filter((m) => m.parent!.visible),
+          false,
+        )
+      : [];
     const nextHover = hits.length ? cards[hits[0].object.userData.i as number] : null;
     if (nextHover !== hovered) {
       hovered = nextHover;
       o.onHover(hovered ? hovered.href : null);
     }
-    boxHover = !hovered && !opened && raycaster.intersectObject(box, true).length > 0;
+    boxHover = pointerOn && !hovered && !opened && raycaster.intersectObject(box, true).length > 0;
     canvas.style.cursor = hovered || boxHover ? "pointer" : "default";
 
     // ── cards: rise out of the box, then ease into a slow orbit ──
@@ -592,6 +602,7 @@ export function createIntro(o: Opts): IntroEngine {
     if (exiting) return [];
     exiting = true;
     et = 0;
+    renderer.shadowMap.autoUpdate = true; // the box sinks away, and its shadow with it
     hovered = null;
     canvas.style.cursor = "default";
     for (const m of boxMats) {

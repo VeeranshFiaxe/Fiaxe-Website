@@ -56,7 +56,8 @@ export function Section({
 }: {
   id?: string;
   eyebrow?: string;
-  title: string;
+  /* a string gets the word-by-word rise; pass nodes for inline parts like an FSlot */
+  title: ReactNode;
   copy?: string;
   /* right-aligned slot next to the heading, e.g. a "view all" link */
   aside?: ReactNode;
@@ -73,7 +74,11 @@ export function Section({
       <div className="grid gap-6 border-t border-line pt-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
         <div data-reveal>
           {eyebrow && <Eyebrow className="mb-6">{eyebrow}</Eyebrow>}
-          <Headline text={title} className="display max-w-3xl text-[2.25rem] text-balance md:text-[3.25rem]" />
+          {typeof title === "string" ? (
+            <Headline text={title} className="display max-w-3xl text-[2.25rem] text-balance md:text-[3.25rem]" />
+          ) : (
+            <h2 className="display max-w-3xl text-[2.25rem] text-balance md:text-[3.25rem]">{title}</h2>
+          )}
           {copy && (
             <p className="mt-5 max-w-2xl text-[17px] leading-relaxed text-muted text-pretty">{copy}</p>
           )}
@@ -134,9 +139,11 @@ export function Orb({
     <span
       aria-hidden
       data-anim
-      className={`orb block ${grain ? "orb-grain" : ""} ${breathe ? "orb-breathe" : ""} ${className}`}
+      className={`orb block ${breathe ? "orb-breathe" : ""} ${className}`}
       style={vars({ "--accent": accent })}
-    />
+    >
+      {grain && <span className="orb-noise" />}
+    </span>
   );
 }
 
@@ -371,11 +378,11 @@ export function Faq({ items }: { items: { q: string; a: string }[] }) {
 }
 
 /* Client logos in a hairline grid (static, like a trust wall). */
-export function LogoWall({ label = "Trusted by teams at", compact = false }: { label?: string; compact?: boolean }) {
+export function LogoWall({ label = "Trusted by teams at", compact = false }: { label?: ReactNode; compact?: boolean }) {
   return (
     <section className={`mx-auto max-w-7xl px-5 md:px-8 ${compact ? "py-10" : "py-16"}`}>
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <p className="text-[15px] text-muted">{label}</p>
+        {typeof label === "string" ? <p className="text-[15px] text-muted">{label}</p> : label}
         <Link href="/customer-stories" className="btn btn-ghost btn-sm">
           Read customer stories
         </Link>
@@ -437,7 +444,7 @@ export function SiteCta({
 /* Sticky row of in-page anchors under the hero (Accenture-style). */
 export function SubNav({ items }: { items: { label: string; href: string }[] }) {
   return (
-    <div className="sticky top-16 z-30 border-y border-line bg-canvas/85 backdrop-blur-md">
+    <div className="glass sticky top-16 z-30 border-y border-line bg-canvas/85 backdrop-blur-md">
       <nav className="subnav no-scrollbar mx-auto flex max-w-7xl gap-1 overflow-x-auto px-5 md:px-8">
         {items.map((i) => (
           <a

@@ -124,13 +124,29 @@ export default function Home() {
           </p>
         </section>
 
-        <LogoWall compact />
+        <LogoWall
+          compact
+          label={
+            <div>
+              <h2 className="display text-3xl text-balance md:text-4xl">
+                <F rest="IAXE" /> is trusted by teams at
+              </h2>
+              <p className="mt-3 max-w-xl text-[15px] leading-relaxed text-muted">
+                Placeholder: startups and established businesses who hand us
+                their websites, workflows, tools and phone lines.
+              </p>
+            </div>
+          }
+        />
 
         {/* every offering at a glance; each card jumps to its section below */}
         <section
           id="solutions"
           className="scroll-mt-24 mx-auto max-w-7xl px-5 pt-6 pb-6 md:px-8"
         >
+          <h2 className="display mb-8 text-3xl text-balance md:text-4xl">
+            <F rest="ive" /> ways we can help. Tap one to jump to it.
+          </h2>
           <ul className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-5">
             {[
               ...SERVICES.map((s) => ({ ...s, kind: "Service" })),
@@ -304,11 +320,28 @@ export default function Home() {
           </section>
         ))}
 
+        {/* the F's last stop: past here it stays in this headline */}
+        <section className="mx-auto max-w-4xl px-5 pt-16 pb-24 text-center md:px-8">
+          <h2 className="display text-5xl text-balance md:text-7xl">
+            <F rest="ind" /> the right fit in one call.
+          </h2>
+          <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted">
+            Placeholder: not sure what fits? Book a free call and we&apos;ll
+            point you to the right service or product.
+          </p>
+          <div className="mt-10 flex flex-wrap justify-center gap-3">
+            <Button href="/contact-us">Book a call</Button>
+            <Button href="/customer-stories" variant="ghost">
+              See customer stories
+            </Button>
+          </div>
+        </section>
+
         {/* ── Numbers ── */}
         <Section
           compact
           eyebrow="By the numbers"
-          title="Placeholder: results our clients can measure"
+          title="Figures our clients can check."
         >
           <Stats
             items={[
@@ -336,7 +369,7 @@ export default function Home() {
         <Section
           compact
           eyebrow="How we work"
-          title="One process across every engagement"
+          title="From first call to launch, one process."
         >
           <Steps />
         </Section>
@@ -345,7 +378,7 @@ export default function Home() {
         <Section
           compact
           eyebrow="Why Fiaxe"
-          title="Placeholder: why teams pick us"
+          title="Four reasons teams pick us."
         >
           <div className="grid border-t border-l border-line md:grid-cols-2 lg:grid-cols-4">
             {WHY.map((w, i) => (
@@ -366,25 +399,14 @@ export default function Home() {
         </Section>
 
         {/* ── FAQ ── */}
-        <Section compact eyebrow="FAQ" title="Questions, answered">
+        <Section
+          compact
+          eyebrow="FAQ"
+          title="Questions, answered"
+          className="pb-24! md:pb-32!"
+        >
           <Faq items={HOME_FAQ} />
         </Section>
-
-        <section className="mx-auto max-w-4xl px-5 pt-10 pb-32 text-center md:px-8">
-          <h2 className="display text-5xl text-balance md:text-7xl">
-            <F rest="ind" /> the right fit in one call.
-          </h2>
-          <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted">
-            Placeholder: not sure what fits? Book a free call and we&apos;ll
-            point you to the right service or product.
-          </p>
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Button href="/contact-us">Book a call</Button>
-            <Button href="/customer-stories" variant="ghost">
-              See customer stories
-            </Button>
-          </div>
-        </section>
       </FTrail>
     </>
   );

@@ -12,6 +12,7 @@ import {
   HemisphereLight,
   Mesh,
   MeshPhysicalMaterial,
+  MeshStandardMaterial,
   PerspectiveCamera,
   PMREMGenerator,
   Scene,
@@ -53,8 +54,10 @@ const FOV = 30;
 const DIST = 10;
 
 export function createTrail(canvas: HTMLCanvasElement, dark: boolean): TrailEngine {
-  const renderer = new WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  // low-power machine (.lite, set in app/layout.tsx): fewer pixels, no MSAA, no clearcoat pass
+  const lite = document.documentElement.classList.contains("lite");
+  const renderer = new WebGLRenderer({ canvas, antialias: !lite, alpha: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, lite ? 1 : 1.5));
   renderer.toneMapping = ACESFilmicToneMapping;
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.setClearColor(0x000000, 0);
@@ -77,7 +80,9 @@ export function createTrail(canvas: HTMLCanvasElement, dark: boolean): TrailEngi
   scene.add(rim);
 
   // metal that matches the page's text colour in either theme
-  const body = new MeshPhysicalMaterial({ metalness: 0.9, roughness: 0.3, clearcoat: 0.6, clearcoatRoughness: 0.25 });
+  const body = lite
+    ? new MeshStandardMaterial({ metalness: 0.9, roughness: 0.28 })
+    : new MeshPhysicalMaterial({ metalness: 0.9, roughness: 0.3, clearcoat: 0.6, clearcoatRoughness: 0.25 });
   const setTheme = (d: boolean) => {
     body.color = new Color(d ? 0xd8d6d2 : 0x3a3834);
   };

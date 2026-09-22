@@ -55,6 +55,13 @@ export function IntroBox() {
       return () => cancelAnimationFrame(id);
     }
     const root = document.documentElement;
+    // tells the page's own 3D (FTrail) to wait until the intro lets go
+    root.dataset.intro = "playing";
+    const release3d = () => {
+      if (root.dataset.intro !== "playing") return;
+      delete root.dataset.intro;
+      window.dispatchEvent(new Event("fx:intro-end"));
+    };
     root.style.overflow = "hidden";
     // keep the scrollbar's space, so the page doesn't shift when it returns
     // (the puzzle pieces copy the page before that)
@@ -74,6 +81,7 @@ export function IntroBox() {
     leave.current = (href?: string) => {
       if (!alive) return;
       alive = false;
+      release3d();
       try {
         sessionStorage.setItem(KEY, "1");
       } catch {}
@@ -129,6 +137,7 @@ export function IntroBox() {
 
     return () => {
       alive = false;
+      delete root.dataset.intro;
       window.clearTimeout(timer);
       release();
       root.style.overflow = "";

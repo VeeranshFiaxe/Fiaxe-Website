@@ -36,8 +36,8 @@ const NAV = [
 ];
 
 /* Automation and AI training have their own hand-built pages; every other
-   service uses the template below: hero, live preview, what's included,
-   process, work, FAQ, other services, CTA. */
+   service uses the template below: hero with its live preview, in practice,
+   what's included, process, work, FAQ, other services, CTA. */
 export default async function ServicePage({ params }: Props) {
   const { slug } = await params;
   const service = SERVICES.find((x) => x.slug === slug);
@@ -50,27 +50,34 @@ export default async function ServicePage({ params }: Props) {
 
   return (
     <div style={{ "--accent": accent } as CSSProperties}>
-      <ServiceHero service={service} nav={NAV}>
+      <ServiceHero
+        service={service}
+        nav={NAV}
+        visual={
+          <div className="fade-up relative" style={{ "--delay": "0.25s" } as CSSProperties}>
+            <div aria-hidden className="uc-glow absolute -inset-10 -z-10 rounded-full opacity-70" />
+            <ServicePreview slug={service.slug} accent={accent} />
+          </div>
+        }
+      >
         <TagRow tags={service.tags} />
       </ServiceHero>
 
       <Section id="overview" eyebrow="In practice" title="Placeholder: what working with us on this looks like">
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-          <div data-reveal>
-            <ServicePreview slug={service.slug} accent={accent} />
-          </div>
-          <ul className="divide-y divide-line border-y border-line">
-            {service.features.slice(0, 3).map((f, i) => (
-              <li key={f.title} data-reveal style={{ "--d": i } as CSSProperties} className="flex gap-5 py-6">
-                <span className="font-mono text-xs text-faint">0{i + 1}</span>
-                <div>
-                  <h3 className="text-lg tracking-tight">{f.title}</h3>
-                  <p className="mt-1 text-[15px] text-muted">{f.copy}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ol className="grid border-t border-l border-line md:grid-cols-3">
+          {service.features.slice(0, 3).map((f, i) => (
+            <li
+              key={f.title}
+              data-reveal
+              style={{ "--d": i } as CSSProperties}
+              className="tilt flex flex-col border-r border-b border-line p-7 md:p-9"
+            >
+              <span className="display text-6xl text-[var(--accent)] md:text-7xl">0{i + 1}</span>
+              <h3 className="mt-12 text-xl tracking-tight">{f.title}</h3>
+              <p className="mt-2 text-[15px] leading-relaxed text-muted">{f.copy}</p>
+            </li>
+          ))}
+        </ol>
       </Section>
 
       <Section id="included" eyebrow="What's included" title="Placeholder: everything you get">

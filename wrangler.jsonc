@@ -3,21 +3,13 @@
   "name": "fiaxe-website",
   "main": "worker/index.ts",
 
-  // WebVerge (xtremetricks12@gmail.com). Pinned so a `wrangler login` under a
-  // different account cannot silently deploy this site somewhere else.
-  "account_id": "bc179c6141c15f2b2f69a8615300724b",
+  // Veeransh@fiaxe.com. Pinned so a `wrangler login` under a different account
+  // cannot silently deploy this site somewhere else.
+  "account_id": "e5d0ecc8ece937004ed24fd6a708e015",
   "compatibility_date": "2026-08-11",
 
-  // Production. Cutover 2026-09-03: these two custom domains replaced the
-  // Framer records the apex and www used to point at. The apex serves the
-  // site; www 308s to it from worker/index.ts.
-  "routes": [
-    { "pattern": "fiaxe.com", "custom_domain": true },
-    { "pattern": "www.fiaxe.com", "custom_domain": true }
-  ],
-
-  // Adding `routes` turns the workers.dev URL off by default; keep it on so
-  // fiaxe-website.xaif.workers.dev stays available as a fallback.
+  // No custom domain for now: the site is served only from
+  // fiaxe-website.veeransh.workers.dev.
   "workers_dev": true,
 
   "assets": {
@@ -42,12 +34,10 @@
     "run_worker_first": ["/*", "!/_next/*", "!/recordings/*", "!/logos/*", "!/hero/*"]
   },
 
-  // worker/n8n-forwarder.ts, deployed from wrangler.n8n-forwarder.jsonc. The
-  // /api/* handlers post here instead of straight to n8n, because a subrequest
-  // from this zone-bound Worker to n8n.fiaxe.com loops. Must stay an https://
-  // workers.dev URL: a service binding inherits this Worker's zone context and
-  // hits the same loop.
-  "vars": { "N8N_FORWARD_URL": "https://fiaxe-website-n8n-forwarder.xaif.workers.dev/" },
+  // Not bound to the fiaxe.com zone, so this Worker can post to n8n directly
+  // and the forwarder (worker/n8n-forwarder.ts) is not needed. Put the
+  // forwarder's workers.dev URL back here if a fiaxe.com custom domain returns.
+  "vars": { "N8N_FORWARD_URL": "https://n8n.fiaxe.com/webhook/6307d669-2cfb-403f-92b3-26754074f984" },
 
   "observability": { "enabled": true }
 }

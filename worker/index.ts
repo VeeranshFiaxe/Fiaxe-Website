@@ -7,6 +7,8 @@
 // cannot emit on its own.
 
 import { proxyBookDemo, proxyCareers } from "../lib/webhook-proxy";
+import { summarizeCall } from "../lib/call-summary";
+import { liveTranscribe } from "../lib/live-transcribe";
 
 // Minimal shape of the static-assets binding. Declared locally so this file
 // type-checks under the Next.js tsconfig without pulling in workers-types.
@@ -15,6 +17,11 @@ interface Env {
   // URL of worker/n8n-forwarder.ts. See lib/webhook-proxy.ts for why the n8n
   // call cannot be made from this Worker directly.
   N8N_FORWARD_URL: string;
+  // Secrets behind /api/call-summary (`wrangler secret put`). Absent in a
+  // fresh checkout, in which case the endpoint answers 503 and the live-call
+  // dock simply skips the report.
+  DEEPGRAM_API_KEY?: string;
+  DEEPSEEK_API_KEY?: string;
 }
 
 const ROUTES: Record<
@@ -53,6 +60,18 @@ export default {
           "x-robots-tag": "noindex, nofollow",
         },
       });
+    }
+
+    // Posts an audio recording rather than a form, so it takes the whole env
+    // instead of the n8n forward URL.
+    if (url.pathname === "/api/call-summary") {
+      return summarizeCall(request, env);
+    }
+
+    // Live captions: the page streams call audio up this socket and the
+    // Worker relays it to Deepgram, so the key stays server-side.
+    if (url.pathname === "/api/live-transcribe") {
+      return liveTranscribe(request, env);
     }
 
     const handler = ROUTES[url.pathname];

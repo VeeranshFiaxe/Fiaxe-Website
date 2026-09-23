@@ -74,7 +74,9 @@ export function SiteFx() {
       if (mag) {
         const r = mag.getBoundingClientRect();
         const dx = x - (r.left + r.width / 2), dy = y - (r.top + r.height / 2);
-        mag.style.transform = `translate(${dx * 0.15}px, ${dy * 0.2}px)`;
+        // a gentle lean toward the cursor, capped so wide buttons never slide far
+        const cap = (d: number) => Math.max(-8, Math.min(8, d * 0.11));
+        mag.style.transform = `translate(${cap(dx)}px, ${cap(dy)}px)`;
       }
     };
 
@@ -91,7 +93,7 @@ export function SiteFx() {
       if (nextMag !== mag) {
         reset(mag, "mag");
         mag = nextMag;
-        if (mag) mag.style.transition = "transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1)";
+        if (mag) mag.style.transition = "transform 0.7s cubic-bezier(0.16, 0.84, 0.28, 1)";
       }
       if (!frame && (tilt || mag)) frame = requestAnimationFrame(paint);
     };

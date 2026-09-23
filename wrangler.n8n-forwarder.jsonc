@@ -3,7 +3,7 @@
   "name": "fiaxe-website-n8n-forwarder",
   "main": "worker/n8n-forwarder.ts",
 
-  "account_id": "bc179c6141c15f2b2f69a8615300724b",
+  "account_id": "e5d0ecc8ece937004ed24fd6a708e015",
   "compatibility_date": "2026-08-11",
 
   // Deliberately no `routes` and no custom domain: being unattached to the

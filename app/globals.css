@@ -19,7 +19,13 @@
 
   --font-display: var(--font-inter), system-ui, sans-serif;
   --font-body: var(--font-inter), system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-mono: var(--font-inter), system-ui, sans-serif;
+
+  /* Every weight sits a touch heavier than stock. */
+  --font-weight-light: 350;
+  --font-weight-normal: 450;
+  --font-weight-medium: 560;
+  --font-weight-semibold: 650;
 }
 
 @theme {
@@ -198,6 +204,7 @@ body {
   background: var(--canvas);
   color: var(--cream);
   font-family: var(--font-body);
+  font-weight: 450;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
   /* theme swap is handled by the DOM-overlay circle wipe in ThemeToggle.
@@ -388,45 +395,137 @@ body {
 @keyframes grow-x { from { transform: scaleX(0); } }
 @keyframes light-up { from { background: var(--line-bright); box-shadow: none; } }
 
-/* ── service previews (components/site/ServicePreview.tsx) ── */
-@keyframes pv-build {
-  0%, 8% { opacity: 0; transform: translateY(8px) scale(0.98); }
-  18%, 82% { opacity: 1; transform: none; }
-  92%, 100% { opacity: 0; }
+/* ── service previews (components/site/ServicePreview.tsx) ──
+   Every scene runs on one 8s loop; parts join in at set points of it. */
+@property --num { syntax: "<integer>"; inherits: false; initial-value: 0; }
+.pv-count { counter-reset: n var(--num); animation: pv-count 8s cubic-bezier(0.22, 0.61, 0.24, 1) infinite both; }
+.pv-count::after { content: counter(n); }
+@keyframes pv-count { 0%, 5% { --num: 0; } 35%, 94% { --num: var(--to); } 100% { --num: 0; } }
+
+/* scenes are laid out for a ~560px frame; narrower frames zoom the whole
+   scene down in steps so text and rows never spill out */
+.pv-frame { container-type: inline-size; }
+/* percentages ignore zoom, so the box still fills the frame while its px-sized contents shrink */
+.pv-zoom { --z: 1; zoom: var(--z); width: 100%; height: 100%; }
+@container (max-width: 540px) { .pv-zoom { --z: 0.88; } }
+@container (max-width: 470px) { .pv-zoom { --z: 0.76; } }
+@container (max-width: 400px) { .pv-zoom { --z: 0.64; } }
+@container (max-width: 330px) { .pv-zoom { --z: 0.54; } }
+@container (max-width: 270px) { .pv-zoom { --z: 0.44; } }
+
+/* website: wireframe, then fill, then a click */
+.pv-w {
+  --pv-fill: var(--surface-2);
+  border: 1px dashed var(--line-bright);
+  animation: pv-w 8s cubic-bezier(0.22, 0.61, 0.24, 1) infinite both;
+  animation-delay: calc(var(--i) * 0.12s);
 }
-.pv-build { animation: pv-build 5s cubic-bezier(0.22, 0.61, 0.24, 1) infinite; animation-delay: calc(var(--i) * 0.25s); }
-
-@keyframes pv-cursor {
-  0% { transform: translate(20%, 70%); }
-  30% { transform: translate(62%, 38%); }
-  55% { transform: translate(75%, 80%); }
-  80% { transform: translate(30%, 30%); }
-  100% { transform: translate(20%, 70%); }
+.pv-w-ink { --pv-fill: color-mix(in srgb, var(--cream) 82%, transparent); }
+.pv-w-accent { --pv-fill: var(--accent); }
+.pv-w-img { --pv-fill: color-mix(in srgb, var(--accent) 22%, var(--canvas)); }
+@keyframes pv-w {
+  0% { opacity: 0; translate: 0 4px; }
+  6%, 20% { opacity: 1; translate: none; background-color: transparent; border-color: var(--line-bright); }
+  30%, 92% { opacity: 1; background-color: var(--pv-fill); border-color: transparent; }
+  100% { opacity: 0; background-color: var(--pv-fill); border-color: transparent; }
 }
-.pv-cursor { animation: pv-cursor 6s ease-in-out infinite; }
-
-@keyframes pv-dash { to { stroke-dashoffset: -24; } }
-.pv-flow { stroke-dasharray: 4 8; animation: pv-dash 0.9s linear infinite; }
-
-@keyframes pv-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent); }
-  12% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent) 30%, transparent); border-color: var(--accent); }
-  30% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent); }
+.pv-w-img > * { animation: pv-w-kids 8s ease-out infinite both; animation-delay: 0.24s; }
+@keyframes pv-w-kids { 0%, 24% { opacity: 0; translate: 0 12%; } 34%, 92% { opacity: 1; translate: none; } 100% { opacity: 0; } }
+.pv-img-sun { background: radial-gradient(circle, color-mix(in srgb, var(--accent) 35%, white), transparent 70%); }
+.pv-cta { animation: pv-w 8s cubic-bezier(0.22, 0.61, 0.24, 1) infinite both, pv-press 8s infinite; animation-delay: calc(var(--i) * 0.12s), 0s; }
+@keyframes pv-press { 0%, 50% { scale: 1; } 52% { scale: 0.92; } 56%, 100% { scale: 1; } }
+.pv-web-cursor { animation: pv-web-cursor 8s cubic-bezier(0.45, 0, 0.25, 1) infinite both; }
+@keyframes pv-web-cursor {
+  0%, 30% { opacity: 0; transform: translate(78%, 90%); }
+  33% { opacity: 1; transform: translate(78%, 90%); }
+  50%, 58% { opacity: 1; transform: translate(14%, 65.5%); }
+  86% { opacity: 1; transform: translate(62%, 42%); }
+  92%, 100% { opacity: 0; transform: translate(62%, 42%); }
 }
-.pv-node { animation: pv-pulse 3.2s ease-out infinite; animation-delay: calc(var(--i) * 0.8s); }
+.pv-click { opacity: 0; animation: pv-click 8s ease-out infinite; }
+@keyframes pv-click { 0%, 50% { opacity: 0; scale: 0.3; } 51% { opacity: 1; scale: 0.4; } 62%, 100% { opacity: 0; scale: 1.8; } }
+.pv-toast { animation: pv-toast 8s cubic-bezier(0.3, 1.3, 0.5, 1) infinite both; }
+@keyframes pv-toast { 0%, 55% { opacity: 0; translate: 0 -10px; } 60%, 92% { opacity: 1; translate: none; } 100% { opacity: 0; } }
+.pv-score { animation: pv-score-in 8s cubic-bezier(0.3, 1.3, 0.5, 1) infinite both; }
+@keyframes pv-score-in { 0%, 30% { opacity: 0; translate: 0 10px; } 36%, 92% { opacity: 1; translate: none; } 100% { opacity: 0; } }
+.pv-score-ring { stroke-dasharray: 100; animation: pv-ring 8s cubic-bezier(0.22, 0.61, 0.24, 1) infinite both; }
+@keyframes pv-ring { 0%, 36% { stroke-dashoffset: 100; } 62%, 100% { stroke-dashoffset: 0; } }
+.pv-score .pv-count { animation-name: pv-count-late; }
+@keyframes pv-count-late { 0%, 36% { --num: 0; } 62%, 100% { --num: var(--to); } }
 
-@keyframes pv-bar { 0%, 100% { transform: scaleY(var(--a)); } 50% { transform: scaleY(var(--b)); } }
-.pv-bar { transform-origin: bottom; animation: pv-bar 3.6s ease-in-out infinite; animation-delay: calc(var(--i) * -0.4s); }
+/* automation: one keyframe per step sets --pv-v (lit, 0/1) and --pv-p (wire
+   progress, 0 to 1); nodes, wires, packets and log lines all read them, so
+   they stay in step and every step switches off together at 88-94% */
+@property --pv-v { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --pv-p { syntax: "<number>"; inherits: true; initial-value: 0; }
+.pv-s0 { animation: pv-s0 8s linear infinite both; }
+.pv-s1 { animation: pv-s1 8s linear infinite both; }
+.pv-s2 { animation: pv-s2 8s linear infinite both; }
+.pv-s3 { animation: pv-s3 8s linear infinite both; }
+@keyframes pv-s0 { 0% { --pv-v: 0; --pv-p: 0; } 1% { --pv-v: 1; --pv-p: 0; } 14%, 88% { --pv-v: 1; --pv-p: 1; } 94%, 100% { --pv-v: 0; --pv-p: 1; } }
+@keyframes pv-s1 { 0%, 15% { --pv-v: 0; --pv-p: 0; } 16% { --pv-v: 1; --pv-p: 0; } 29%, 88% { --pv-v: 1; --pv-p: 1; } 94%, 100% { --pv-v: 0; --pv-p: 1; } }
+@keyframes pv-s2 { 0%, 30% { --pv-v: 0; --pv-p: 0; } 31% { --pv-v: 1; --pv-p: 0; } 44%, 88% { --pv-v: 1; --pv-p: 1; } 94%, 100% { --pv-v: 0; --pv-p: 1; } }
+@keyframes pv-s3 { 0%, 45% { --pv-v: 0; --pv-p: 0; } 46% { --pv-v: 1; --pv-p: 0; } 59%, 88% { --pv-v: 1; --pv-p: 1; } 94%, 100% { --pv-v: 0; --pv-p: 1; } }
+.pv-wire { stroke-dasharray: 1; stroke-dashoffset: calc(1 - var(--pv-p)); opacity: var(--pv-v); }
+/* a zero-length dash with a round cap is a dot; the offset slides it along the wire */
+.pv-packet { stroke-dasharray: 0 2; stroke-dashoffset: calc(-1 * var(--pv-p)); opacity: min(1, var(--pv-p) * 30, (1 - var(--pv-p)) * 30); filter: drop-shadow(0 0 3px var(--accent)); }
+.pv-node-box { stroke: color-mix(in srgb, var(--accent) calc(var(--pv-v) * 70%), var(--line)); stroke-width: 1; }
+.pv-node-ring { stroke: var(--accent); stroke-width: calc((1 + var(--pv-p) * 10) * 1px); opacity: calc(var(--pv-v) * (1 - var(--pv-p)) * 0.5); }
+.pv-node-icon { fill: color-mix(in srgb, var(--accent) calc(var(--pv-v) * 100%), var(--surface-2)); }
+.pv-node-glyph { stroke: color-mix(in srgb, #000 calc(var(--pv-v) * 100%), var(--cream)); }
+.pv-log { opacity: calc(0.15 + var(--pv-v) * 0.85); }
+.pv-log-done { animation: pv-log-done 8s ease-out infinite both; }
+@keyframes pv-log-done { 0%, 46% { opacity: 0; } 50%, 90% { opacity: 1; } 96%, 100% { opacity: 0; } }
 
-@keyframes pv-fill { 0% { transform: scaleX(0); } 60%, 100% { transform: scaleX(var(--w)); } }
-.pv-fill { transform-origin: left; animation: pv-fill 4s cubic-bezier(0.22, 0.61, 0.24, 1) infinite alternate; animation-delay: calc(var(--i) * 0.3s); }
+/* custom tools: chart draws, a new order lands, an approval goes through */
+.pv-chart { animation: pv-chart 8s cubic-bezier(0.45, 0, 0.25, 1) infinite both; }
+@keyframes pv-chart { 0%, 5% { clip-path: inset(0 100% 0 0); } 40%, 94% { clip-path: inset(0); opacity: 1; } 100% { clip-path: inset(0); opacity: 0; } }
+.pv-area { animation: pv-area 8s ease-out infinite both; }
+@keyframes pv-area { 0%, 28% { opacity: 0; } 45%, 94% { opacity: 1; } 100% { opacity: 0; } }
+.pv-row-new { animation: pv-row-new 8s cubic-bezier(0.3, 1.2, 0.5, 1) infinite both; }
+@keyframes pv-row-new { 0%, 42% { opacity: 0; translate: -30% 0; } 48%, 94% { opacity: 1; translate: none; } 100% { opacity: 0; } }
+.pv-pending { animation: pv-pending 8s infinite both; }
+@keyframes pv-pending { 0%, 66% { opacity: 1; } 68%, 96% { opacity: 0; } 100% { opacity: 1; } }
+.pv-approved { animation: pv-approved 8s cubic-bezier(0.3, 1.6, 0.5, 1) infinite both; }
+@keyframes pv-approved { 0%, 66% { opacity: 0; scale: 0.6; } 70%, 94% { opacity: 1; scale: 1; } 100% { opacity: 0; } }
+.pv-tools-cursor { animation: pv-tools-cursor 8s cubic-bezier(0.45, 0, 0.25, 1) infinite both; }
+@keyframes pv-tools-cursor {
+  0%, 46% { opacity: 0; transform: translate(55%, 45%); }
+  50% { opacity: 1; transform: translate(55%, 45%); }
+  64%, 70% { opacity: 1; transform: translate(91%, 85%); }
+  82%, 100% { opacity: 0; transform: translate(70%, 60%); }
+}
 
-/* clip, not width: revealing the text never re-lays out the card */
-@keyframes pv-type { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
-.pv-type { white-space: nowrap; animation: pv-type 2.6s steps(34) infinite alternate; }
+/* training: modules tick off, a prompt is typed and answered */
+/* one keyframes per module (set inline), so all four reset together */
+.pv-mod-tick { animation: 8s cubic-bezier(0.3, 1.6, 0.5, 1) infinite both; }
+.pv-mod { animation: 8s ease-out infinite both; }
+@keyframes pv-tick-0 { 0%, 5% { opacity: 0; scale: 0.3; } 9%, 90% { opacity: 1; scale: 1; } 96%, 100% { opacity: 0; } }
+@keyframes pv-mod-0 { 0%, 5% { border-color: var(--line); } 7% { border-color: var(--accent); } 15%, 100% { border-color: var(--line); } }
+@keyframes pv-tick-1 { 0%, 17% { opacity: 0; scale: 0.3; } 21%, 90% { opacity: 1; scale: 1; } 96%, 100% { opacity: 0; } }
+@keyframes pv-mod-1 { 0%, 17% { border-color: var(--line); } 19% { border-color: var(--accent); } 27%, 100% { border-color: var(--line); } }
+@keyframes pv-tick-2 { 0%, 29% { opacity: 0; scale: 0.3; } 33%, 90% { opacity: 1; scale: 1; } 96%, 100% { opacity: 0; } }
+@keyframes pv-mod-2 { 0%, 29% { border-color: var(--line); } 31% { border-color: var(--accent); } 39%, 100% { border-color: var(--line); } }
+@keyframes pv-tick-3 { 0%, 41% { opacity: 0; scale: 0.3; } 45%, 90% { opacity: 1; scale: 1; } 96%, 100% { opacity: 0; } }
+@keyframes pv-mod-3 { 0%, 41% { border-color: var(--line); } 43% { border-color: var(--accent); } 51%, 100% { border-color: var(--line); } }
+.pv-type { white-space: nowrap; animation: pv-type 8s steps(38) infinite both; }
+@keyframes pv-type { 0%, 4% { clip-path: inset(0 100% 0 0); } 28%, 94% { clip-path: inset(0); } 100% { clip-path: inset(0 100% 0 0); } }
+.pv-reply { animation: pv-reply 8s cubic-bezier(0.22, 0.61, 0.24, 1) infinite both; }
+@keyframes pv-reply { 0%, 30% { opacity: 0; translate: 0 8px; } 36%, 94% { opacity: 1; translate: none; } 100% { opacity: 0; } }
+.pv-bar-row { animation: pv-reply 8s cubic-bezier(0.22, 0.61, 0.24, 1) infinite both; animation-delay: calc(0.4s + var(--i) * 0.35s); }
+.pv-theme { transform-origin: left; animation: pv-theme 8s cubic-bezier(0.22, 0.61, 0.24, 1) infinite both; animation-delay: calc(0.4s + var(--i) * 0.35s); }
+@keyframes pv-theme { 0%, 34% { transform: scaleX(0); } 48%, 94% { transform: scaleX(var(--w)); } 100% { transform: scaleX(0); } }
+.pv-fluency { transform-origin: left; animation: pv-fluency 8s cubic-bezier(0.45, 0, 0.25, 1) infinite both; }
+@keyframes pv-fluency { 0%, 8% { transform: scaleX(0.34); } 80%, 94% { transform: scaleX(0.86); } 100% { transform: scaleX(0.34); } }
+.pv-count-fluency { animation-name: pv-count-fluency; animation-timing-function: cubic-bezier(0.45, 0, 0.25, 1); }
+@keyframes pv-count-fluency { 0%, 8% { --num: 34; } 80%, 94% { --num: 86; } 100% { --num: 34; } }
 
 @media (prefers-reduced-motion: reduce) {
-  .pv-build, .pv-cursor, .pv-flow, .pv-node, .pv-bar, .pv-fill, .pv-type, .spin-border { animation: none !important; }
+  [class*="pv-"], .spin-border { animation: none !important; }
+  .pv-count { --num: var(--to); }
+  .pv-count-fluency { --num: 86; }
+  .pv-web-cursor, .pv-tools-cursor, .pv-click, .pv-packet, .pv-pending { opacity: 0; }
+  .pv-s0, .pv-s1, .pv-s2, .pv-s3 { --pv-v: 1; --pv-p: 1; }
   .tilt { transform: none !important; }
   .fade-up { animation: none; }
   .fx [data-reveal] { opacity: 1 !important; translate: none !important; transition: none; }
@@ -466,7 +565,7 @@ html.no-intro #fx-intro {
 @layer components {
 .display {
   font-family: var(--font-display);
-  font-weight: 300;
+  font-weight: 350;
   letter-spacing: -0.035em;
   line-height: 1.02;
 }
@@ -478,7 +577,7 @@ html.no-intro #fx-intro {
   border-radius: 999px;
   padding: 0.8rem 1.35rem;
   font-size: 0.9375rem;
-  font-weight: 500;
+  font-weight: 560;
   line-height: 1;
   white-space: nowrap;
   transition: background-color 0.2s, border-color 0.2s, color 0.2s, opacity 0.2s;
@@ -576,6 +675,8 @@ html.no-intro #fx-intro {
 /* ── Automation canvas (components/site/WorkflowCanvas.tsx) ── */
 .wf-edge { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); transition: stroke-dashoffset 0.7s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.5s; }
 .wf-edge[data-on] { stroke-dashoffset: 0; }
+.wf-lit { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.wf-lit[data-on] { stroke-dashoffset: 0; transition: stroke-dashoffset var(--run) linear; }
 .wf-node { opacity: 0; scale: 0.8; transition: opacity 0.4s, scale 0.5s cubic-bezier(0.3, 1.5, 0.5, 1); }
 .wf-node[data-on] { opacity: 1; scale: 1; }
 .wf-node[data-run] .wf-tile { box-shadow: 0 0 0 2px var(--accent), 0 0 24px -2px var(--accent); }
@@ -606,6 +707,7 @@ html.no-intro #fx-intro {
   .orb::after, .orb-breathe, .wf-packet { animation: none !important; }
   .rise-w > span { animation: none !important; transform: none !important; }
   .wf-edge { stroke-dashoffset: 0 !important; transition: none; }
+  .wf-lit[data-on] { transition: none; }
   .wf-node { opacity: 1 !important; scale: 1 !important; }
 }
 
@@ -620,4 +722,179 @@ html.no-intro #fx-intro {
   -webkit-backdrop-filter: none;
   backdrop-filter: none;
   background-color: color-mix(in srgb, var(--canvas) 97%, transparent);
+}
+
+/* ── Call console (components/site/CallConsole.tsx) ──
+   A ring of bars around the play button. Sized in container units so the
+   ring scales with the button; the analyser writes each bar's scaleY while a
+   call plays, otherwise a wave runs round the ring in CSS. */
+.cc-panel {
+  background:
+    radial-gradient(55% 60% at 25% 45%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 70%),
+    color-mix(in srgb, var(--ink) 85%, transparent);
+}
+.vp { container-type: inline-size; }
+.vp-bar {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1.1cqw;
+  min-width: 2px;
+  height: 16cqw;
+  margin-left: -0.55cqw;
+  transform-origin: 50% 0;
+  transform: rotate(calc(var(--i) * 5deg + 180deg)) translateY(33cqw);
+  opacity: calc(0.55 + 0.45 * sin(var(--i) * 10deg));
+}
+.vp-bar > i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: var(--accent);
+  transform-origin: 50% 0;
+  transform: scaleY(0.2);
+  transition: transform 0.08s linear;
+}
+.vp:not(.vp-live) .vp-bar > i {
+  animation: vp-idle 2.8s ease-in-out infinite;
+  animation-delay: calc(var(--i) * -2.8s / 36);
+}
+@keyframes vp-idle { 0%, 100% { transform: scaleY(0.16); } 50% { transform: scaleY(0.55); } }
+.vp-live .vp-ripple { animation: vp-ripple 1.8s ease-out infinite; }
+@keyframes vp-ripple {
+  from { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); }
+  to { box-shadow: 0 0 0 26px transparent; }
+}
+.cc-skel {
+  background: linear-gradient(90deg, var(--surface-2) 20%, var(--line-bright) 50%, var(--surface-2) 80%);
+  background-size: 200% 100%;
+  animation: cc-shimmer 1.8s linear infinite;
+}
+@keyframes cc-shimmer { to { background-position: -200% 0; } }
+.cc-cap { animation: fade-up 0.4s cubic-bezier(0.22, 0.61, 0.24, 1) both; --y: 6px; }
+
+/* slow light that drifts across the stage */
+.stage-sweep {
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 18%, transparent), transparent);
+  animation: stage-sweep 18s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes stage-sweep { from { transform: translate3d(-15%, 0, 0); } to { transform: translate3d(85%, 0, 0); } }
+
+/* ── Anatomy of a call (components/site/CallAnatomy.tsx) ──
+   Six-second loops that only run under .an-on, so a scene restarts from the
+   top each time it becomes the active step. Staggered pieces shift their
+   loop with animation-delay and hold their first frame meanwhile (both). */
+.an-on .an-ring { animation: an-ring 2s ease-out infinite both; animation-delay: calc(var(--i) * 0.66s); }
+@keyframes an-ring { from { scale: 0.6; opacity: 0.7; } to { scale: 2; opacity: 0; } }
+.an-ring { opacity: 0; }
+.an-on .an-ringing { animation: an-ringing 6s infinite both; }
+@keyframes an-ringing { 0%, 35% { opacity: 1; } 40%, 100% { opacity: 0; } }
+.an-connected { opacity: 0; }
+.an-on .an-connected { animation: an-connected 6s infinite both; }
+@keyframes an-connected { 0%, 38% { opacity: 0; translate: 0 4px; } 44%, 100% { opacity: 1; translate: none; } }
+.an-on .an-pop { animation: an-pop 6s infinite both; }
+@keyframes an-pop { 0%, 38% { opacity: 0; scale: 0.6; } 46%, 100% { opacity: 1; scale: 1; } }
+
+.an-on .an-wave { animation: eq 0.9s ease-in-out infinite; animation-delay: calc(var(--i) * -0.07s); }
+.an-on .an-type { animation: an-type 6s steps(40) infinite both; }
+@keyframes an-type { 0% { clip-path: inset(0 100% 0 0); } 30%, 100% { clip-path: inset(0); } }
+.an-arrow { transform-origin: top; }
+.an-on .an-arrow { animation: an-arrow 6s infinite both; }
+@keyframes an-arrow { 0%, 30% { transform: scaleY(0); } 38%, 100% { transform: none; } }
+.an-on .an-chip { animation: an-chip 6s cubic-bezier(0.3, 1.4, 0.5, 1) infinite both; animation-delay: calc(var(--i) * 0.3s); }
+@keyframes an-chip { 0%, 38% { opacity: 0; translate: 0 10px; scale: 0.94; } 46%, 94% { opacity: 1; translate: none; scale: 1; } 100% { opacity: 0; } }
+
+.an-on .an-spin { animation: an-rot 0.8s linear infinite, an-spin-out 6s infinite both; animation-delay: 0s, calc(var(--i) * 0.7s); }
+@keyframes an-rot { to { rotate: 360deg; } }
+@keyframes an-spin-out { 0%, 20% { opacity: 1; } 26%, 94% { opacity: 0; } 100% { opacity: 1; } }
+.an-check { opacity: 0; }
+.an-on .an-check { animation: an-check 6s cubic-bezier(0.3, 1.6, 0.5, 1) infinite both; animation-delay: calc(var(--i) * 0.7s); }
+@keyframes an-check { 0%, 20% { opacity: 0; scale: 0.4; } 28%, 94% { opacity: 1; scale: 1; } 100% { opacity: 0; } }
+.an-on .an-task { animation: an-task 6s infinite both; animation-delay: calc(var(--i) * 0.7s); }
+@keyframes an-task { 0%, 20% { border-color: var(--line); } 28%, 94% { border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); } }
+.an-on .an-msg { animation: an-msg 6s cubic-bezier(0.22, 0.61, 0.24, 1) infinite both; }
+@keyframes an-msg { 0%, 55% { opacity: 0; translate: 0 14px; scale: 0.96; } 63%, 94% { opacity: 1; translate: none; scale: 1; } 100% { opacity: 0; } }
+
+.an-score, .an-line { transform-origin: left; }
+.an-line { width: calc(var(--w) * 100%); }
+.an-on .an-score { animation: an-score 6s cubic-bezier(0.22, 0.61, 0.24, 1) infinite both; }
+@keyframes an-score { 0%, 8% { transform: scaleX(0); } 40%, 94% { transform: scaleX(0.92); } 100% { transform: scaleX(0); } }
+.an-on .an-line { animation: an-line 6s cubic-bezier(0.22, 0.61, 0.24, 1) infinite both; animation-delay: calc(0.4s + var(--i) * 0.25s); }
+@keyframes an-line { 0%, 10% { transform: scaleX(0); } 30%, 94% { transform: none; } 100% { transform: scaleX(0); } }
+
+/* ── Use-case switchboard and language card ── */
+.uc-glow { background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 22%, transparent), transparent); }
+.uc-in { animation: fade-up 0.5s cubic-bezier(0.22, 0.61, 0.24, 1) both; --y: 8px; }
+.uc-line { animation: fade-up 0.5s cubic-bezier(0.22, 0.61, 0.24, 1) both; animation-delay: calc(0.2s + var(--i) * 0.4s); --y: 10px; }
+
+/* one greeting at a time; the 2%/7%/9% stops assume about 12 words */
+.lang-word { opacity: 0; animation: lang-cycle calc(var(--n) * 2.2s) cubic-bezier(0.22, 0.61, 0.24, 1) infinite both; animation-delay: calc(var(--i) * 2.2s); }
+@keyframes lang-cycle {
+  0% { opacity: 0; translate: 0 30%; filter: blur(6px); }
+  2%, 7% { opacity: 1; translate: none; filter: none; }
+  9%, 100% { opacity: 0; translate: 0 -30%; filter: blur(6px); }
+}
+
+/* launch plan: each phase's bar grows in when its row is revealed */
+.gantt-bar { background: var(--accent); opacity: calc(0.45 + var(--d) * 0.14); transform-origin: left; }
+.fx [data-reveal] .gantt-bar { transform: scaleX(0); transition: transform 0.9s cubic-bezier(0.22, 0.61, 0.24, 1) calc(0.25s + var(--d) * 0.12s); }
+.fx [data-reveal][data-in] .gantt-bar { transform: none; }
+.gantt-live { animation: vp-ripple 1.8s ease-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .vp-bar > i, .vp-ripple, .cc-skel, .stage-sweep, .gantt-live,
+  .an-ring, .an-ringing, .an-connected, .an-pop, .an-wave, .an-type, .an-arrow, .an-chip,
+  .an-spin, .an-check, .an-task, .an-msg, .an-score, .an-line, .uc-in, .uc-line, .cc-cap { animation: none !important; }
+  .an-connected, .an-check, .an-ring { opacity: 1; }
+  .an-ringing, .an-spin, .an-ring { opacity: 0; }
+  .lang-word { animation: none !important; }
+  .lang-word:first-child { opacity: 1; }
+  .fx [data-reveal] .gantt-bar { transform: none; }
+}
+.an-stage { background: radial-gradient(60% 55% at 50% 45%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 75%), var(--canvas); }
+
+/* accent for small text: pulled toward the text colour, so it stays readable
+   on light pages (darker) and dark ones (lighter) */
+.text-accent-ink { color: color-mix(in srgb, var(--accent) 62%, var(--cream)); }
+/* hero live call: the panel and the copy it replaces fade in on swap */
+.lc-in { animation: fade-up 0.45s cubic-bezier(0.22, 0.61, 0.24, 1) both; --y: 8px; }
+@media (prefers-reduced-motion: reduce) { .lc-in { animation: none; } }
+
+/* the hero's live-call button, given a slow accent halo so it reads as the
+   thing to press */
+.lc-cta { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); animation: lc-cta 2.6s ease-out infinite; }
+.lc-cta:hover { animation-play-state: paused; }
+@keyframes lc-cta {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 55%, transparent); }
+  70%, 100% { box-shadow: 0 0 0 14px transparent; }
+}
+@media (prefers-reduced-motion: reduce) { .lc-cta { animation: none; } }
+
+/* live-call panel: sits on the stage, with a scrollbar that doesn't shout */
+.lc-panel { background: color-mix(in srgb, var(--ink) 88%, transparent); }
+.lc-bars > span { will-change: transform; }
+
+@utility thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--cream) 20%, transparent) transparent;
+  &::-webkit-scrollbar { width: 5px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 99px;
+    background: color-mix(in srgb, var(--cream) 20%, transparent);
+  }
+  &::-webkit-scrollbar-thumb:hover { background: color-mix(in srgb, var(--cream) 32%, transparent); }
+}
+
+/* a call in progress: the panel breathes, and each caption line slides up */
+.lc-live { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 30%, transparent); animation: lc-live 3.2s ease-out infinite; }
+@keyframes lc-live {
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 28%, transparent); border-color: color-mix(in srgb, var(--accent) 40%, var(--line)); }
+  70%, 100% { box-shadow: 0 0 0 16px transparent; border-color: var(--line); }
+}
+.lc-line { animation: lc-line 0.35s cubic-bezier(0.22, 0.61, 0.24, 1) both; }
+@keyframes lc-line { from { opacity: 0; translate: 0 8px; } }
+@media (prefers-reduced-motion: reduce) {
+  .lc-live, .lc-line { animation: none; }
 }

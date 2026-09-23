@@ -15,7 +15,7 @@ import {
 import { ServicePreview } from "@/components/site/ServicePreview";
 import { FSlot } from "@/components/site/FSlot";
 import { FTrail } from "@/components/site/FTrail";
-import { VoiceSamples } from "@/components/site/VoiceSamples";
+import { CallConsole } from "@/components/site/CallConsole";
 import { IntroBox } from "@/components/site/IntroBox";
 import { CountUp } from "@/components/client";
 
@@ -110,7 +110,6 @@ export default function Home() {
       <FTrail>
         {/* hero: the 3D F starts here, large, then flies down the page */}
         <section className="mx-auto flex max-w-5xl flex-col items-center px-5 pt-28 pb-10 text-center md:px-8">
-          <Eyebrow>Services &amp; products</Eyebrow>
           <FSlot
             hero
             className="my-8 h-[34svh] w-full text-cream md:my-10 md:h-[38svh]"
@@ -306,14 +305,9 @@ export default function Home() {
               className="stage relative overflow-hidden rounded-[2rem] p-7 md:p-10"
               style={{ "--accent": p.accent } as CSSProperties}
             >
-              <Orb
-                accent={p.accent}
-                breathe
-                className="absolute -top-20 -right-20 w-72 opacity-80 md:w-96"
-              />
               <div className="relative">
                 {p.slug === "voice-ai" ? (
-                  <VoiceSamples accent={p.accent} />
+                  <CallConsole compact />
                 ) : null}
               </div>
             </div>

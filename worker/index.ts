@@ -8,7 +8,6 @@
 
 import { proxyBookDemo, proxyCareers } from "../lib/webhook-proxy";
 import { summarizeCall } from "../lib/call-summary";
-import { liveTranscribe } from "../lib/live-transcribe";
 
 // Minimal shape of the static-assets binding. Declared locally so this file
 // type-checks under the Next.js tsconfig without pulling in workers-types.
@@ -66,12 +65,6 @@ export default {
     // instead of the n8n forward URL.
     if (url.pathname === "/api/call-summary") {
       return summarizeCall(request, env);
-    }
-
-    // Live captions: the page streams call audio up this socket and the
-    // Worker relays it to Deepgram, so the key stays server-side.
-    if (url.pathname === "/api/live-transcribe") {
-      return liveTranscribe(request, env);
     }
 
     const handler = ROUTES[url.pathname];

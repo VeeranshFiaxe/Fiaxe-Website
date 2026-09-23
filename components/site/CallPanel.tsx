@@ -8,10 +8,12 @@ import { CallReportView } from "./CallReportView";
 /* A live call with our voice agent, in the page. The provider's widget runs
    headless (no UI of its own), so everything the visitor sees is ours.
 
-   While the call runs both sides are recorded -- the agent on the left
-   channel, the caller on the right -- and streamed to /api/live-transcribe
-   for captions. When it ends, those words go to /api/call-summary, which
-   writes the report shown here (lib/call-summary.ts). */
+   Captions come from the voice server itself: it already transcribes the
+   caller to answer them and knows every word the agent says, and it sends
+   both down the widget's signaling socket as the call runs. So captions cost
+   nothing extra and who spoke is never a guess. When the call ends, those
+   words go to /api/call-summary, which writes the report shown here
+   (lib/call-summary.ts); the recording is only a fallback. */
 
 const TOKEN =
   process.env.NEXT_PUBLIC_VOICE_WIDGET_TOKEN ?? "emb_q9JQkqck36Exq0CXCgi1ZxGP07yVIaz7SgKSBI7UD_s";
@@ -23,7 +25,7 @@ type Status = "idle" | "loading" | "connecting" | "connected" | "summarising" | 
 type Widget = {
   start: () => Promise<void> | void;
   stop: () => Promise<void> | void;
-  getState: () => { stream?: MediaStream | null };
+  getState: () => { stream?: MediaStream | null; ws?: WebSocket | null };
   onStatusChange: (cb: (status: string) => void) => void;
   onCallEnd: (cb: () => void) => void;
   onError: (cb: (e: unknown) => void) => void;
@@ -37,7 +39,15 @@ declare global {
 
 const BARS = 40;
 
-type Line = { text: string; who: "agent" | "caller" };
+type Line = { id: number; text: string; who: "agent" | "caller"; live?: boolean };
+
+/* What the voice server sends down the widget's socket as the call runs.
+   Agent words arrive one at a time, as they are spoken; the caller's come as
+   guesses that settle into final text. */
+type Feed =
+  | { type: "rtf-bot-text"; payload: { text: string } }
+  | { type: "rtf-user-transcription"; payload: { text: string; final: boolean } }
+  | { type: "rtf-bot-started-speaking" | "rtf-bot-stopped-speaking" };
 
 function loadWidget(): Promise<Widget> {
   if (window.DograhWidget) return Promise.resolve(window.DograhWidget);
@@ -89,22 +99,64 @@ export function CallPanel({ onClose }: { onClose: () => void }) {
   const [seconds, setSeconds] = useState(0);
   const [report, setReport] = useState<CallReport | null>(null);
   const [note, setNote] = useState("");
-  // what has been said so far: settled lines, plus the words Deepgram is
-  // still making up its mind about. Deepgram hears one mixed stream, so who
-  // spoke is decided here, from which side's microphone was loud (see below).
+  // the last few lines on screen, the newest possibly still being spoken
   const [lines, setLines] = useState<Line[]>([]);
-  const [draft, setDraft] = useState<Line | null>(null);
   const bars = useRef<HTMLDivElement>(null);
-  const audio = useRef<{ ctx: AudioContext; mix: MediaStreamAudioDestinationNode; an: AnalyserNode } | null>(null);
+  const audio = useRef<{ ctx: AudioContext } | null>(null);
   const recorder = useRef<MediaRecorder | null>(null);
   const chunks = useRef<BlobPart[]>([]);
-  const socket = useRef<WebSocket | null>(null);
-  const transcript = useRef<string[]>([]);
-  // energy heard from each side since the last settled line
-  const heard = useRef({ agent: 0, caller: 0 });
+  // the whole call, line by line; `open` is whose turn is still running, so
+  // their next words join the same line
+  const said = useRef<{ lines: Line[]; open: Line["who"] | null }>({ lines: [], open: null });
   const widget = useRef<Widget | null>(null);
 
   const live = status === "connected";
+
+  // One message from the voice server. Consecutive words from the same side
+  // join one line until the other side takes the floor.
+  const hear = useCallback((e: MessageEvent) => {
+    let msg: Feed;
+    try {
+      msg = JSON.parse(e.data as string);
+    } catch {
+      return;
+    }
+    const s = said.current;
+    const add = (who: Line["who"], text: string) => {
+      const last = s.lines[s.lines.length - 1];
+      if (s.open === who && last) s.lines[s.lines.length - 1] = { ...last, text: `${last.text} ${text}` };
+      else s.lines.push({ id: s.lines.length, who, text });
+      s.open = who;
+    };
+    let guess = "";
+    switch (msg.type) {
+      case "rtf-bot-text":
+        if (!msg.payload.text?.trim()) return;
+        add("agent", msg.payload.text.trim());
+        break;
+      case "rtf-user-transcription": {
+        const text = msg.payload.text?.trim();
+        if (!text) return;
+        if (msg.payload.final) add("caller", text);
+        else guess = text;
+        break;
+      }
+      case "rtf-bot-started-speaking":
+      case "rtf-bot-stopped-speaking":
+        // either way, whoever was talking has finished their turn
+        s.open = null;
+        break;
+      default:
+        return;
+    }
+    const shown = s.lines.slice(-2);
+    if (guess) {
+      const last = shown[shown.length - 1];
+      if (s.open === "caller" && last) shown[shown.length - 1] = { ...last, text: `${last.text} ${guess}`, live: true };
+      else shown.push({ id: s.lines.length, who: "caller", text: guess, live: true });
+    }
+    setLines(shown.slice(-2));
+  }, []);
   const busy = status === "loading" || status === "connecting";
 
   useEffect(() => {
@@ -127,17 +179,17 @@ export function CallPanel({ onClose }: { onClose: () => void }) {
   }, []);
 
   const summarise = useCallback(async (blob: Blob) => {
-    const said = transcript.current.join("\n");
-    if (blob.size < 20_000 && said.length < 120) return onClose();
+    const text = said.current.lines.map((l) => `${l.who === "agent" ? "Agent" : "Caller"}: ${l.text}`).join("\n");
+    if (blob.size < 20_000 && text.length < 120) return onClose();
     setStatus("summarising");
     try {
       // The captions already transcribed the call, so send those words and
       // skip a second pass over the audio; the recording is the fallback.
-      const useText = said.length >= 120;
+      const useText = text.length >= 120;
       const res = await fetch("/api/call-summary", {
         method: "POST",
         headers: { "content-type": useText ? "application/json" : blob.type || "audio/webm" },
-        body: useText ? JSON.stringify({ transcript: said }) : blob,
+        body: useText ? JSON.stringify({ transcript: text }) : blob,
       });
       if (!res.ok) {
         // 503 means summaries are not configured: say nothing, just close
@@ -167,102 +219,29 @@ export function CallPanel({ onClose }: { onClose: () => void }) {
 
     const ctx = new AudioContext();
     const mix = ctx.createMediaStreamDestination();
-    // Keep the two sides on separate channels -- agent left, caller right --
-    // rather than mixing them down. Deepgram then transcribes each channel on
-    // its own, which is what makes the speaker labels exact.
-    mix.channelCount = 2;
-    mix.channelCountMode = "explicit";
-    mix.channelInterpretation = "discrete";
-    const merger = ctx.createChannelMerger(2);
-    merger.connect(mix);
-
-    const an = ctx.createAnalyser();
-    an.fftSize = 256;
-    an.smoothingTimeConstant = 0.78;
     // one analyser per side, so the bars follow whoever is speaking
     const sides: { who: "agent" | "caller"; an: AnalyserNode }[] = [];
-    for (const [who, stream, channel] of [
-      ["agent", agent, 0],
-      ["caller", mic, 1],
+    for (const [who, stream] of [
+      ["agent", agent],
+      ["caller", mic],
     ] as const) {
       if (!stream) continue;
       const src = ctx.createMediaStreamSource(stream);
-      src.connect(merger, 0, channel);
+      src.connect(mix);
       const side = ctx.createAnalyser();
       side.fftSize = 256;
       side.smoothingTimeConstant = 0.78;
       src.connect(side);
       sides.push({ who, an: side });
     }
-    audio.current = { ctx, mix, an };
-
-
-
+    audio.current = { ctx };
     chunks.current = [];
-    transcript.current = [];
-    setLines([]);
-    setDraft(null);
-
-    // Live captions: the page streams the same mixed audio up to our Worker,
-    // which relays it to Deepgram (lib/live-transcribe.ts). Captions are a
-    // bonus -- under `next dev` there is no Worker, so they simply stay off
-    // and the call and its report are unaffected.
-    // The recorder starts before the socket finishes connecting, and the very
-    // first chunk carries the WebM header: drop it and Deepgram cannot decode
-    // anything that follows. So chunks queue until the socket is open.
-    let queued: Blob[] | null = [];
-    try {
-      const ws = new WebSocket(
-        `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/api/live-transcribe`,
-      );
-      ws.onopen = () => {
-        for (const chunk of queued ?? []) ws.send(chunk);
-        queued = null;
-      };
-      ws.onclose = () => {
-        queued = null;
-      };
-      ws.onmessage = (e) => {
-        const msg = JSON.parse(e.data as string);
-        if (msg.type !== "Results") return;
-        const text: string = msg.channel?.alternatives?.[0]?.transcript?.trim() ?? "";
-        if (!text) return;
-        // channel_index is [index, total]: channel 0 is the agent, 1 the
-        // caller. If the stream ended up mono, fall back to guessing from
-        // whichever side has been louder.
-        const [index, total]: [number?, number?] = msg.channel_index ?? [];
-        let who: Line["who"];
-        if (total !== undefined && total >= 2 && (index === 0 || index === 1)) {
-          who = index === 0 ? "agent" : "caller";
-        } else {
-          const { agent: a, caller: c } = heard.current;
-          who = a >= c ? "agent" : "caller";
-        }
-        if (msg.is_final) {
-          heard.current = { agent: 0, caller: 0 };
-          transcript.current.push(`${who === "agent" ? "Agent" : "Caller"}: ${text}`);
-          setLines((l) => [...l.slice(-6), { text, who }]);
-          setDraft(null);
-        } else {
-          setDraft({ text, who });
-        }
-      };
-      ws.onerror = () => ws.close();
-      socket.current = ws;
-    } catch {
-      socket.current = null;
-      queued = null;
-    }
 
     try {
       const rec = new MediaRecorder(mix.stream);
       rec.ondataavailable = (e) => {
         if (!e.data.size) return;
         chunks.current.push(e.data);
-        const ws = socket.current;
-        if (ws?.readyState === WebSocket.OPEN) ws.send(e.data);
-        // still connecting: hold the chunk, but not for ever
-        else if (queued && queued.length < 40) queued.push(e.data);
       };
       rec.onstop = () => {
         const blob = new Blob(chunks.current, { type: rec.mimeType || "audio/webm" });
@@ -271,8 +250,7 @@ export function CallPanel({ onClose }: { onClose: () => void }) {
         audio.current = null;
         summarise(blob);
       };
-      // chunked, so the same blobs feed the captions as they are recorded
-      rec.start(250);
+      rec.start(1000);
       recorder.current = rec;
     } catch {
       recorder.current = null;
@@ -293,7 +271,6 @@ export function CallPanel({ onClose }: { onClose: () => void }) {
       let best = 0;
       for (const side of sides) {
         const l = level(side.an);
-        heard.current[side.who] += l;
         if (l > best) {
           best = l;
           loudest = side;
@@ -314,12 +291,7 @@ export function CallPanel({ onClose }: { onClose: () => void }) {
       raf = requestAnimationFrame(draw);
     };
     raf = requestAnimationFrame(draw);
-    return () => {
-      cancelAnimationFrame(raf);
-      if (socket.current?.readyState === WebSocket.OPEN) socket.current.send(JSON.stringify({ type: "CloseStream" }));
-      socket.current?.close();
-      socket.current = null;
-    };
+    return () => cancelAnimationFrame(raf);
   }, [live, summarise]);
 
   // leaving the page must hang up
@@ -347,6 +319,8 @@ export function CallPanel({ onClose }: { onClose: () => void }) {
     setStatus("loading");
     setSeconds(0);
     setReport(null);
+    said.current = { lines: [], open: null };
+    setLines([]);
     setNote("");
     try {
       const w = await loadWidget();
@@ -367,10 +341,13 @@ export function CallPanel({ onClose }: { onClose: () => void }) {
         setStatus("failed");
       });
       await w.start();
+      // the socket exists once start() has sent the offer, before the
+      // server has said a word
+      w.getState().ws?.addEventListener("message", hear);
     } catch {
       setStatus("failed");
     }
-  }, [live, busy, endCall, stopAudio]);
+  }, [live, busy, endCall, stopAudio, hear]);
 
 
   // the panel only exists because someone pressed the button
@@ -445,12 +422,11 @@ export function CallPanel({ onClose }: { onClose: () => void }) {
                 />
               ))}
             </div>
-            {live && (lines.length > 0 || draft) ? (
+            {live && lines.length > 0 ? (
               <div className="lc-caps mt-4 flex h-[7rem] flex-col justify-end gap-1.5 overflow-hidden">
-                {lines.slice(draft ? -1 : -2).map((l, i) => (
-                  <Bubble key={`${l.text}-${i}`} who={l.who} text={l.text} />
+                {lines.map((l) => (
+                  <Bubble key={l.id} who={l.who} text={l.text} live={l.live} />
                 ))}
-                {draft && <Bubble who={draft.who} text={draft.text} live />}
               </div>
             ) : (
               <p className={`mt-5 text-[13.5px] leading-relaxed text-muted ${live ? "flex h-[5.5rem] items-end" : ""}`}>

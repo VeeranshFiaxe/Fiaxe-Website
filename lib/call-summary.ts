@@ -92,8 +92,8 @@ export async function summarizeCall(request: Request, env: SummaryKeys): Promise
   if (request.method !== "POST") return json({ error: "Method not allowed" }, 405);
   if (!env.DEEPSEEK_API_KEY) return json({ error: "Summaries are not configured" }, 503);
 
-  // The page streamed the call to Deepgram for captions, so it already has a
-  // transcript: analyse that instead of transcribing the audio a second time.
+  // The voice server captioned the call as it ran, so the page already has a
+  // transcript: analyse that instead of transcribing the audio.
   if (request.headers.get("content-type")?.includes("application/json")) {
     const sent = ((await request.json()) as { transcript?: unknown })?.transcript;
     return analyse(typeof sent === "string" ? sent : "", env);

@@ -873,7 +873,7 @@ html.no-intro #fx-intro {
 
 /* live-call panel: sits on the stage, with a scrollbar that doesn't shout */
 .lc-panel { background: color-mix(in srgb, var(--ink) 88%, transparent); }
-.lc-bars > span { will-change: transform; }
+
 
 @utility thin-scroll {
   scrollbar-width: thin;
@@ -898,3 +898,17 @@ html.no-intro #fx-intro {
 @media (prefers-reduced-motion: reduce) {
   .lc-live, .lc-line { animation: none; }
 }
+
+/* Call waveform. It sits quiet and pale by default and only takes the accent
+   while the agent is speaking, so the panel is not a wall of green. */
+.lc-bars > span {
+  will-change: transform;
+  background: color-mix(in srgb, var(--cream) 42%, transparent);
+  transition: background-color 0.45s ease;
+}
+.lc-bars[data-speaker="agent"] > span { background: color-mix(in srgb, var(--accent) 78%, transparent); }
+.lc-bars[data-speaker="caller"] > span { background: color-mix(in srgb, var(--cream) 72%, transparent); }
+
+/* older lines fade out at the top of the caption window rather than being
+   sliced through */
+.lc-caps { mask-image: linear-gradient(to bottom, transparent, black 18%); }

@@ -36,7 +36,9 @@ declare global {
   }
 }
 
-const BARS = 28;
+const BARS = 40;
+
+type Line = { text: string; who: "agent" | "caller" };
 
 function loadWidget(): Promise<Widget> {
   if (window.DograhWidget) return Promise.resolve(window.DograhWidget);
@@ -58,6 +60,26 @@ function loadWidget(): Promise<Widget> {
   });
 }
 
+/* One line of the call. The agent sits on the left, the caller on the
+   right, the way a chat reads. */
+function Bubble({ who, text, live = false }: { who: "agent" | "caller"; text: string; live?: boolean }) {
+  const agent = who === "agent";
+  return (
+    <p
+      className={`lc-line max-w-[85%] rounded-2xl px-3 py-1.5 text-[13px] leading-snug ${
+        agent
+          ? "self-start rounded-tl-sm bg-surface-2 text-cream"
+          : "self-end rounded-tr-sm bg-[color-mix(in_srgb,var(--accent)_14%,var(--surface-2))] text-cream"
+      } ${live ? "opacity-80" : ""}`}
+    >
+      <span className="mb-0.5 block font-mono text-[9px] tracking-wider text-faint uppercase">
+        {agent ? "Agent" : "You"}
+      </span>
+      {text}
+    </p>
+  );
+}
+
 const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
 
@@ -67,8 +89,9 @@ export function LiveCall() {
   const [report, setReport] = useState<CallReport | null>(null);
   const [note, setNote] = useState("");
   // what has been said so far: settled lines, plus the words Deepgram is
-  // still making up its mind about
-  const [lines, setLines] = useState<string[]>([]);
+  // still making up its mind about. Deepgram hears one mixed stream, so who
+  // spoke is decided here, from which side's microphone was loud (see below).
+  const [lines, setLines] = useState<Line[]>([]);
   const [draft, setDraft] = useState("");
   const bars = useRef<HTMLDivElement>(null);
   const audio = useRef<{ ctx: AudioContext; mix: MediaStreamAudioDestinationNode; an: AnalyserNode } | null>(null);
@@ -76,6 +99,8 @@ export function LiveCall() {
   const chunks = useRef<BlobPart[]>([]);
   const socket = useRef<WebSocket | null>(null);
   const transcript = useRef<string[]>([]);
+  // energy heard from each side since the last settled line
+  const heard = useRef({ agent: 0, caller: 0 });
   const widget = useRef<Widget | null>(null);
 
   const live = status === "connected";
@@ -140,15 +165,23 @@ export function LiveCall() {
     const ctx = new AudioContext();
     const mix = ctx.createMediaStreamDestination();
     const an = ctx.createAnalyser();
-    an.fftSize = 128;
-    an.smoothingTimeConstant = 0.72;
-    for (const stream of [agent, mic]) {
+    an.fftSize = 256;
+    an.smoothingTimeConstant = 0.78;
+    // one analyser per side: the shape of the bars comes from whoever is
+    // talking, and comparing the two tells us who that is
+    const sides: { who: "agent" | "caller"; an: AnalyserNode }[] = [];
+    for (const [who, stream] of [
+      ["agent", agent],
+      ["caller", mic],
+    ] as const) {
       if (!stream) continue;
       const src = ctx.createMediaStreamSource(stream);
       src.connect(mix);
-      // only the agent's voice drives the bars, so the caller's mic doesn't
-      // make them jump while they speak
-      if (stream === agent) src.connect(an);
+      const side = ctx.createAnalyser();
+      side.fftSize = 256;
+      side.smoothingTimeConstant = 0.78;
+      src.connect(side);
+      sides.push({ who, an: side });
     }
     audio.current = { ctx, mix, an };
 
@@ -171,8 +204,13 @@ export function LiveCall() {
         const text: string = msg.channel?.alternatives?.[0]?.transcript?.trim() ?? "";
         if (!text) return;
         if (msg.is_final) {
-          transcript.current.push(text);
-          setLines((l) => [...l.slice(-6), text]);
+          // Deepgram hears one mixed stream, so attribute the line to
+          // whichever side has been louder since the last one.
+          const { agent: a, caller: c } = heard.current;
+          const who = a >= c ? "agent" : "caller";
+          heard.current = { agent: 0, caller: 0 };
+          transcript.current.push(`${who === "agent" ? "Agent" : "Caller"}: ${text}`);
+          setLines((l) => [...l.slice(-6), { text, who } as Line]);
           setDraft("");
         } else {
           setDraft(text);
@@ -205,15 +243,37 @@ export function LiveCall() {
       recorder.current = null;
     }
 
-    const data = new Uint8Array(an.frequencyBinCount);
+    const spectrum = new Uint8Array(sides[0]?.an.frequencyBinCount ?? 0);
+    const wave = new Uint8Array(sides[0]?.an.fftSize ?? 0);
+    const level = (node: AnalyserNode) => {
+      node.getByteTimeDomainData(wave);
+      let sum = 0;
+      for (let i = 0; i < wave.length; i++) sum += ((wave[i] - 128) / 128) ** 2;
+      return Math.sqrt(sum / wave.length);
+    };
     let raf = 0;
     const draw = () => {
-      an.getByteFrequencyData(data);
+      // who holds the floor right now
+      let loudest = sides[0];
+      let best = 0;
+      for (const side of sides) {
+        const l = level(side.an);
+        heard.current[side.who] += l;
+        if (l > best) {
+          best = l;
+          loudest = side;
+        }
+      }
       const kids = bars.current?.children;
-      if (kids) {
+      if (kids && loudest) {
+        bars.current?.setAttribute("data-speaker", best > 0.015 ? loudest.who : "quiet");
+        loudest.an.getByteFrequencyData(spectrum);
+        const mid = (kids.length - 1) / 2;
         for (let i = 0; i < kids.length; i++) {
-          const v = Math.min(1, (data[Math.floor((i / kids.length) * data.length * 0.6)] / 255) * 1.3);
-          (kids[i] as HTMLElement).style.transform = `scaleY(${0.12 + v * 0.88})`;
+          // mirrored around the middle, so it reads as one voice, not a chart
+          const d = Math.abs(i - mid) / mid;
+          const v = Math.min(1, (spectrum[Math.floor(d * spectrum.length * 0.55)] / 255) * 1.35);
+          (kids[i] as HTMLElement).style.transform = `scaleY(${0.06 + v * 0.94})`;
         }
       }
       raf = requestAnimationFrame(draw);
@@ -369,31 +429,31 @@ export function LiveCall() {
           )
         ) : (
           <div className="flex h-full flex-col justify-center py-2">
-            <div ref={bars} aria-hidden className="lc-bars flex h-14 items-center gap-[3px]">
+            <div
+              ref={bars}
+              aria-hidden
+              data-speaker="quiet"
+              className="lc-bars flex h-12 items-center justify-between gap-[2px]"
+            >
               {Array.from({ length: BARS }, (_, i) => (
                 <span
                   key={i}
-                  className={`h-full flex-1 origin-center rounded-full bg-[var(--accent)] ${live ? "" : "animate-eq"}`}
+                  className={`h-full w-[2px] origin-center rounded-full ${live ? "" : "animate-eq"}`}
                   style={{
-                    opacity: +(0.35 + 0.65 * Math.sin((i / BARS) * Math.PI)).toFixed(3),
-                    transform: live ? "scaleY(0.12)" : undefined,
-                    animationDelay: `${(i % 9) * -0.12}s`,
-                    animationDuration: `${1 + (i % 4) * 0.2}s`,
+                    opacity: +(0.3 + 0.7 * Math.sin((i / BARS) * Math.PI)).toFixed(3),
+                    transform: live ? "scaleY(0.06)" : undefined,
+                    animationDelay: `${(i % 11) * -0.1}s`,
+                    animationDuration: `${1 + (i % 5) * 0.18}s`,
                   }}
                 />
               ))}
             </div>
             {live && (lines.length > 0 || draft) ? (
-              <div className="mt-5 flex h-[5.5rem] flex-col justify-end gap-1 overflow-hidden">
-                {lines.slice(-2).map((l, i, all) => (
-                  <p
-                    key={`${l}-${i}`}
-                    className={`lc-line text-[13.5px] leading-snug ${i === all.length - 1 && !draft ? "text-cream" : "text-muted"}`}
-                  >
-                    {l}
-                  </p>
+              <div className="lc-caps mt-4 flex h-[7rem] flex-col justify-end gap-1.5 overflow-hidden">
+                {lines.slice(draft ? -1 : -2).map((l, i) => (
+                  <Bubble key={`${l.text}-${i}`} who={l.who} text={l.text} />
                 ))}
-                {draft && <p className="lc-line text-[13.5px] leading-snug text-cream">{draft}</p>}
+                {draft && <Bubble who={lines.at(-1)?.who === "agent" ? "caller" : "agent"} text={draft} live />}
               </div>
             ) : (
               <p className={`mt-5 text-[13.5px] leading-relaxed text-muted ${live ? "flex h-[5.5rem] items-end" : ""}`}>

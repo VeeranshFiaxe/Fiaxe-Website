@@ -15,7 +15,20 @@ type CfResponse = Response & { webSocket?: CfSocket };
 const DEEPGRAM =
   "https://api.deepgram.com/v1/listen?model=nova-3&language=multi&smart_format=true&punctuate=true&interim_results=true";
 
-const ALLOWED = [/^https?:\/\/localhost(:\d+)?$/, /^https:\/\/([a-z0-9-]+\.)*fiaxe\.com$/];
+/* Same-origin only, so the socket cannot be used as a free Deepgram proxy.
+   Matching the request's own host covers every place this Worker is served
+   from -- fiaxe.com, the workers.dev URL and any preview -- and localhost is
+   there for `wrangler dev`. */
+function sameOrigin(request: Request): boolean {
+  const origin = request.headers.get("origin");
+  if (!origin) return false;
+  try {
+    const from = new URL(origin);
+    return from.host === new URL(request.url).host || /^localhost(:\d+)?$/.test(from.host);
+  } catch {
+    return false;
+  }
+}
 
 export async function liveTranscribe(request: Request, env: { DEEPGRAM_API_KEY?: string }): Promise<Response> {
   if (request.headers.get("upgrade")?.toLowerCase() !== "websocket") {
@@ -23,8 +36,7 @@ export async function liveTranscribe(request: Request, env: { DEEPGRAM_API_KEY?:
   }
   if (!env.DEEPGRAM_API_KEY) return new Response("Live captions are not configured", { status: 503 });
 
-  const origin = request.headers.get("origin") ?? "";
-  if (!ALLOWED.some((re) => re.test(origin))) return new Response("Forbidden", { status: 403 });
+  if (!sameOrigin(request)) return new Response("Forbidden", { status: 403 });
 
   const upstream: CfResponse = await fetch(DEEPGRAM, {
     headers: { Upgrade: "websocket", Authorization: `Token ${env.DEEPGRAM_API_KEY}` },

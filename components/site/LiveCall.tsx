@@ -194,10 +194,21 @@ export function LiveCall() {
     // which relays it to Deepgram (lib/live-transcribe.ts). Captions are a
     // bonus -- under `next dev` there is no Worker, so they simply stay off
     // and the call and its report are unaffected.
+    // The recorder starts before the socket finishes connecting, and the very
+    // first chunk carries the WebM header: drop it and Deepgram cannot decode
+    // anything that follows. So chunks queue until the socket is open.
+    let queued: Blob[] | null = [];
     try {
       const ws = new WebSocket(
         `${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/api/live-transcribe`,
       );
+      ws.onopen = () => {
+        for (const chunk of queued ?? []) ws.send(chunk);
+        queued = null;
+      };
+      ws.onclose = () => {
+        queued = null;
+      };
       ws.onmessage = (e) => {
         const msg = JSON.parse(e.data as string);
         if (msg.type !== "Results") return;
@@ -220,6 +231,7 @@ export function LiveCall() {
       socket.current = ws;
     } catch {
       socket.current = null;
+      queued = null;
     }
 
     try {
@@ -227,7 +239,10 @@ export function LiveCall() {
       rec.ondataavailable = (e) => {
         if (!e.data.size) return;
         chunks.current.push(e.data);
-        if (socket.current?.readyState === WebSocket.OPEN) socket.current.send(e.data);
+        const ws = socket.current;
+        if (ws?.readyState === WebSocket.OPEN) ws.send(e.data);
+        // still connecting: hold the chunk, but not for ever
+        else if (queued && queued.length < 40) queued.push(e.data);
       };
       rec.onstop = () => {
         const blob = new Blob(chunks.current, { type: rec.mimeType || "audio/webm" });

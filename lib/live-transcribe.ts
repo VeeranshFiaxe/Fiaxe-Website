@@ -13,7 +13,12 @@ type CfSocket = WebSocket & { accept(): void };
 type CfResponse = Response & { webSocket?: CfSocket };
 
 const DEEPGRAM =
-  "https://api.deepgram.com/v1/listen?model=nova-3&language=multi&smart_format=true&punctuate=true&interim_results=true";
+  "https://api.deepgram.com/v1/listen?model=nova-3&language=multi&smart_format=true&punctuate=true&interim_results=true&multichannel=true";
+
+/* The page sends the agent on the left channel and the caller on the right.
+   `multichannel` then transcribes each channel on its own and tags every
+   result with channel_index: [index, total], so the page knows who spoke
+   without guessing. A mono stream simply reports a total of 1. */
 
 /* Same-origin only, so the socket cannot be used as a free Deepgram proxy.
    Matching the request's own host covers every place this Worker is served

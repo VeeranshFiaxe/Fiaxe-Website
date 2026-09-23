@@ -92,7 +92,7 @@ export function LiveCall() {
   // still making up its mind about. Deepgram hears one mixed stream, so who
   // spoke is decided here, from which side's microphone was loud (see below).
   const [lines, setLines] = useState<Line[]>([]);
-  const [draft, setDraft] = useState("");
+  const [draft, setDraft] = useState<Line | null>(null);
   const bars = useRef<HTMLDivElement>(null);
   const audio = useRef<{ ctx: AudioContext; mix: MediaStreamAudioDestinationNode; an: AnalyserNode } | null>(null);
   const recorder = useRef<MediaRecorder | null>(null);
@@ -164,19 +164,27 @@ export function LiveCall() {
 
     const ctx = new AudioContext();
     const mix = ctx.createMediaStreamDestination();
+    // Keep the two sides on separate channels -- agent left, caller right --
+    // rather than mixing them down. Deepgram then transcribes each channel on
+    // its own, which is what makes the speaker labels exact.
+    mix.channelCount = 2;
+    mix.channelCountMode = "explicit";
+    mix.channelInterpretation = "discrete";
+    const merger = ctx.createChannelMerger(2);
+    merger.connect(mix);
+
     const an = ctx.createAnalyser();
     an.fftSize = 256;
     an.smoothingTimeConstant = 0.78;
-    // one analyser per side: the shape of the bars comes from whoever is
-    // talking, and comparing the two tells us who that is
+    // one analyser per side, so the bars follow whoever is speaking
     const sides: { who: "agent" | "caller"; an: AnalyserNode }[] = [];
-    for (const [who, stream] of [
-      ["agent", agent],
-      ["caller", mic],
+    for (const [who, stream, channel] of [
+      ["agent", agent, 0],
+      ["caller", mic, 1],
     ] as const) {
       if (!stream) continue;
       const src = ctx.createMediaStreamSource(stream);
-      src.connect(mix);
+      src.connect(merger, 0, channel);
       const side = ctx.createAnalyser();
       side.fftSize = 256;
       side.smoothingTimeConstant = 0.78;
@@ -185,10 +193,12 @@ export function LiveCall() {
     }
     audio.current = { ctx, mix, an };
 
+
+
     chunks.current = [];
     transcript.current = [];
     setLines([]);
-    setDraft("");
+    setDraft(null);
 
     // Live captions: the page streams the same mixed audio up to our Worker,
     // which relays it to Deepgram (lib/live-transcribe.ts). Captions are a
@@ -214,17 +224,24 @@ export function LiveCall() {
         if (msg.type !== "Results") return;
         const text: string = msg.channel?.alternatives?.[0]?.transcript?.trim() ?? "";
         if (!text) return;
-        if (msg.is_final) {
-          // Deepgram hears one mixed stream, so attribute the line to
-          // whichever side has been louder since the last one.
+        // channel_index is [index, total]: channel 0 is the agent, 1 the
+        // caller. If the stream ended up mono, fall back to guessing from
+        // whichever side has been louder.
+        const [index, total]: [number?, number?] = msg.channel_index ?? [];
+        let who: Line["who"];
+        if (total !== undefined && total >= 2 && (index === 0 || index === 1)) {
+          who = index === 0 ? "agent" : "caller";
+        } else {
           const { agent: a, caller: c } = heard.current;
-          const who = a >= c ? "agent" : "caller";
+          who = a >= c ? "agent" : "caller";
+        }
+        if (msg.is_final) {
           heard.current = { agent: 0, caller: 0 };
           transcript.current.push(`${who === "agent" ? "Agent" : "Caller"}: ${text}`);
-          setLines((l) => [...l.slice(-6), { text, who } as Line]);
-          setDraft("");
+          setLines((l) => [...l.slice(-6), { text, who }]);
+          setDraft(null);
         } else {
-          setDraft(text);
+          setDraft({ text, who });
         }
       };
       ws.onerror = () => ws.close();
@@ -324,7 +341,7 @@ export function LiveCall() {
     setReport(null);
     setNote("");
     setLines([]);
-    setDraft("");
+    setDraft(null);
   }, [endCall]);
 
   const call = useCallback(async () => {
@@ -468,7 +485,7 @@ export function LiveCall() {
                 {lines.slice(draft ? -1 : -2).map((l, i) => (
                   <Bubble key={`${l.text}-${i}`} who={l.who} text={l.text} />
                 ))}
-                {draft && <Bubble who={lines.at(-1)?.who === "agent" ? "caller" : "agent"} text={draft} live />}
+                {draft && <Bubble who={draft.who} text={draft.text} live />}
               </div>
             ) : (
               <p className={`mt-5 text-[13.5px] leading-relaxed text-muted ${live ? "flex h-[5.5rem] items-end" : ""}`}>

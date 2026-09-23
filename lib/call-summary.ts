@@ -123,7 +123,7 @@ export async function summarizeCall(request: Request, env: SummaryKeys): Promise
 async function analyse(transcript: string, env: SummaryKeys): Promise<Response> {
   if (!env.DEEPSEEK_API_KEY) return json({ error: "Summaries are not configured" }, 503);
   // Anything shorter is a hang-up or silence, not a conversation worth summarising.
-  if (transcript.replace(/Speaker \d+:/g, "").trim().length < 40) return json({ error: "Call too short to summarise" }, 422);
+  if (transcript.replace(/(Speaker \d+|Agent|Caller):/g, "").trim().length < 40) return json({ error: "Call too short to summarise" }, 422);
 
   const dsRes = await fetch("https://api.deepseek.com/chat/completions", {
     method: "POST",
